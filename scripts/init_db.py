@@ -28,6 +28,7 @@ class DatabaseInit:
         self.DATABASE_PORT = os.getenv("DATABASE_PORT")
         self.DATABASE_NAME = os.getenv("DATABASE_NAME")
         self.DATABASE_SCHEMA = os.getenv("DATABASE_SCHEMA")
+        self.SSL_MODE = os.getenv("SSL_MODE")
 
         # URL pour psycopg2 (utilisé pour les schémas et les tables)
         self.new_psycopg2_url_object = URL.create(
@@ -37,6 +38,7 @@ class DatabaseInit:
             host=self.DATABASE_HOST,
             port=self.DATABASE_PORT,
             database=self.DATABASE_NAME,
+            query={"sslmode": self.SSL_MODE}
         )
 
     def create_new_db(self):
@@ -49,6 +51,7 @@ class DatabaseInit:
             host=self.DATABASE_HOST,
             port=self.DATABASE_PORT,
             database="postgres",
+            # query={"sslmode": self.SSL_MODE}  # pas de sslmode avec pg8000
         )
 
         # URL de la nouvelle base (utile pour tester si elle existe déjà ou non)
@@ -59,6 +62,7 @@ class DatabaseInit:
             host=self.DATABASE_HOST,
             port=self.DATABASE_PORT,
             database=self.DATABASE_NAME,
+            # query={"sslmode": self.SSL_MODE}  # pas de sslmode avec pg8000
         )
 
         try:
