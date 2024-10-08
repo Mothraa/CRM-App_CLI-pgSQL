@@ -58,7 +58,7 @@ class UserService:
 
                 user = self.create_user(email, plain_password, first_name, last_name, role)
                 created_users.append(user)
-                print(f"DEBUG Utilisateur de test créé : {user.email} avec le rôle {user.role}")
+                print(f"Utilisateur de test créé : {user.email} avec le rôle {user.role}")
 
             return created_users
 
