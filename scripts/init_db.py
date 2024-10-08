@@ -8,7 +8,7 @@ from sqlalchemy.schema import CreateSchema
 from sqlalchemy_utils import database_exists, create_database
 
 # from my_app.services.user_service import UserService
-src_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+src_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src")
 if src_path not in sys.path:
     sys.path.append(src_path)
 
