@@ -4,16 +4,16 @@ import sys
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, URL, inspect
 from sqlalchemy.schema import CreateSchema
-# from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 from sqlalchemy_utils import database_exists, create_database
 
-# from my_app.services.user_service import UserService
+
 src_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src")
 if src_path not in sys.path:
     sys.path.append(src_path)
 
 from my_app.models import Base
-
+from my_app.services.user_service import UserService
 
 # Pour activer l'option echo de SQLAlchemy (affichage du SQL, très verbeux)
 ECHO = False
@@ -146,10 +146,14 @@ if __name__ == "__main__":
     # note : on n'instancie pas base mais on travaille de manière "globale" (reco SLQAlchemy)
     db_init.create_tables(Base, engine, schema_name=db_init.DATABASE_SCHEMA)
 
-    # creation d'une session pour travailler avec la base
-    # Session = sessionmaker(bind=engine, future=True)
-    # session = Session()
-
     # création des comptes de test
-    # user_service = UserService(session)
-    # user_service.create_test_accounts()
+    # note : creation de la session dans un context pour ne pas avoir besoin de la fermer
+    with Session(engine) as session:
+        # TODO : ajouter un controle + print si un ou plusieurs compte existe déjà
+        try:
+            user_service = UserService(session)
+            user_service.create_test_accounts()
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            print(f"Erreur : {e}")
