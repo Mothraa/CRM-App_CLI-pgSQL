@@ -1,6 +1,7 @@
 import os
 import sys
 
+from getpass import getpass
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, URL, inspect
 from sqlalchemy.schema import CreateSchema
@@ -22,8 +23,8 @@ ECHO = False
 class DatabaseInit:
     def __init__(self):
         load_dotenv()
-        self.DATABASE_USER = os.getenv("DATABASE_USER")
-        self.DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
+        self.DATABASE_ADMIN_USER = os.getenv("DATABASE_ADMIN_USER")
+        self.DATABASE_ADMIN_PASSWORD = os.getenv("DATABASE_ADMIN_PASSWORD")
         self.DATABASE_HOST = os.getenv("DATABASE_HOST")
         self.DATABASE_PORT = os.getenv("DATABASE_PORT")
         self.DATABASE_NAME = os.getenv("DATABASE_NAME")
@@ -33,21 +34,27 @@ class DatabaseInit:
         # URL pour psycopg2 (utilisé pour les schémas et les tables)
         self.new_psycopg2_url_object = URL.create(
             "postgresql+psycopg2",
-            username=self.DATABASE_USER,
-            password=self.DATABASE_PASSWORD,
+            username=self.DATABASE_ADMIN_USER,
+            password=self.DATABASE_ADMIN_PASSWORD,
             host=self.DATABASE_HOST,
             port=self.DATABASE_PORT,
             database=self.DATABASE_NAME,
             query={"sslmode": self.SSL_MODE}
         )
 
-    def create_new_db(self):
+    def request_superuser_access(self):
+        """Prompt to ask name and password of superuser (for creating new db)"""
+        superuser_name = input("Entrer le nom du superutilisateur PostgreSQL afin de créer une nouvelle base : ")
+        superuser_password = getpass("Mot de passe : ")
+        return superuser_name, superuser_password
+
+    def create_new_db(self, superuser_name, superuser_password):
         """create database with pg8000 driver and SQLAlchemy-Utils"""
         # URL pour la connexion à la base postgres par défaut (utile pour créer une nouvelle base)
         default_url_object = URL.create(
             "postgresql+pg8000",
-            username=self.DATABASE_USER,
-            password=self.DATABASE_PASSWORD,
+            username=superuser_name,
+            password=superuser_password,
             host=self.DATABASE_HOST,
             port=self.DATABASE_PORT,
             database="postgres",
@@ -57,8 +64,8 @@ class DatabaseInit:
         # URL de la nouvelle base (utile pour tester si elle existe déjà ou non)
         new_db_pg8000_url_object = URL.create(
             "postgresql+pg8000",
-            username=self.DATABASE_USER,
-            password=self.DATABASE_PASSWORD,
+            username=superuser_name,
+            password=superuser_password,
             host=self.DATABASE_HOST,
             port=self.DATABASE_PORT,
             database=self.DATABASE_NAME,
@@ -133,16 +140,19 @@ if __name__ == "__main__":
     # Initialisation de la configuration
     db_init = DatabaseInit()
 
-    # Création de la base avec pg8000
-    db_init.create_new_db()
+    # Demande le nom et le mot de passe du superuser (en vue de créer une nouvelle base)
+    superuser_name, superuser_password = db_init.request_superuser_access()
 
-    # Création de l'engine pour la nouvelle base avec psycopg2 (pour les schémas et les tables)
+    # Création de la base avec pg8000 et le compte superuser
+    db_init.create_new_db(superuser_name, superuser_password)
+
+    # Création de l'engine pour la nouvelle base avec psycopg2 (pour les schémas et les tables). Utilisation du compte admin dans le .env
     engine = create_engine(db_init.new_psycopg2_url_object, echo=ECHO, future=True)
 
-    # Création du schéma
+    # Création du schéma. Utilisation du compte admin dans le .env
     db_init.create_schema(engine, schema_name=db_init.DATABASE_SCHEMA)
 
-    # Création des tables
+    # Création des tables. Utilisation du compte admin dans le .env
     # note : on n'instancie pas base mais on travaille de manière "globale" (reco SLQAlchemy)
     db_init.create_tables(Base, engine, schema_name=db_init.DATABASE_SCHEMA)
 
