@@ -2,12 +2,15 @@ import pytest
 import datetime
 
 from my_app.services.user_service import UserService  # Assure-toi d'importer UserService correctement
+from my_app.models import RoleType
 
 
 @pytest.fixture
 def mock_session(mocker):
     """Fixture for simulate a session SQLAlchemy and his methods"""
     session = mocker.Mock()
+
+    # gestion des transactions
     session.add = mocker.Mock()
     session.commit = mocker.Mock()
     session.rollback = mocker.Mock()
@@ -29,8 +32,8 @@ def mock_time(monkeypatch):
         @classmethod
         def now(cls, tz=None):
             if tz:
-                return mock_time.astimezone(tz)  # utilise la timezone si indiqué
-            return mock_time
+                return fake_time.astimezone(tz)  # utilise la timezone si indiqué
+            return fake_time
 
     monkeypatch.setattr(datetime, "datetime", MockDateTime)
     return fake_time
@@ -40,8 +43,12 @@ def mock_time(monkeypatch):
 def mock_user(monkeypatch):
     """Fixture to mock a user"""
     class MockUser:
-        def __init__(self, user_id):
+        def __init__(self, user_id, email="michel@test.com", password="hashed_password",
+                     first_name="Michel", last_name="LeTesteur", role=RoleType.admin):
             self.id = user_id
-
-    # TODO : a revoir une fois les couches d'abstraction ajoutées (uniquement l'id pour l'instant)
+            self.email = email
+            self.password_hashed = password
+            self.first_name = first_name
+            self.last_name = last_name
+            self.role = role
     return MockUser(user_id=8)
