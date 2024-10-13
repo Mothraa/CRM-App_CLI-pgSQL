@@ -64,8 +64,9 @@ class SQLAlchemyRepository(Generic[T], IRepository[T]):
 
     def get_all(self) -> List[T]:
         # TODO ajouter de la pagination il peut y avoir beaucoup de données
-        # TODO limiter la selection des colonnes dans les entités enfant\
-        # note : Si on ne veut pas avoir accès a cette methode dans la class enfant lever une exception NotImplementedError
+        # TODO limiter la selection des colonnes dans les entités enfant
+        # note : Si on ne veut pas avoir accès a cette methode dans la class\
+        # enfant lever une exception NotImplementedError
         return self.db_session.query(self.model).all()
 
     @exec_transaction
