@@ -45,7 +45,7 @@ class IRepository(Generic[T]):
     def add(self, entity: T) -> T:
         raise NotImplementedError
 
-    def update(self, entity: T) -> T:
+    def update(self, entity: T, update_data: dict) -> T:
         raise NotImplementedError
 
     def delete(self, entity: T) -> None:
@@ -53,7 +53,7 @@ class IRepository(Generic[T]):
 
 
 # Implémentation générique du repository avec SQLAlchemy
-# TODO mise à jour de IRepository en fonction de SQLAlchemyRepository ?
+# TODO mise à jour de IRepository en fonction de version finale de SQLAlchemyRepository ?
 class SQLAlchemyRepository(Generic[T], IRepository[T]):
     def __init__(self, db_session: Session, model: Type[T]):
         self.db_session = db_session
@@ -63,6 +63,9 @@ class SQLAlchemyRepository(Generic[T], IRepository[T]):
         return self.db_session.query(self.model).get(entity_id)
 
     def get_all(self) -> List[T]:
+        # TODO ajouter de la pagination il peut y avoir beaucoup de données
+        # TODO limiter la selection des colonnes dans les entités enfant\
+        # note : Si on ne veut pas avoir accès a cette methode dans la class enfant lever une exception NotImplementedError
         return self.db_session.query(self.model).all()
 
     @exec_transaction
