@@ -16,39 +16,20 @@ class UserRepository(SQLAlchemyRepository[User]):
 
     def get_by_email(self, email: str) -> User:
         """get an user by his email."""
-        return self.db_session.query(User).filter_by(email=email).first()
+        # add a filter to exclude soft deleted entities
+        # return self.db_session.query(User).filter_by(email=email).first()
+        return self.db_session.query(User).filter(User.email == email, User.deleted_at.is_(None)).first()
 
     def is_user_exist_by_id(self, user_id: int) -> bool:
         """Checks if a user exists by ID"""
         # scalar : pour retourner qu'un element dans sqlalchemy
-        return self.db_session.query(User).exists().where(User.id == user_id).scalar()
+        # add a filter to exclude soft deleted entities
+        # return self.db_session.query(User).exists().where(User.id == user_id).scalar()
+        return self.db_session.query(User).filter(User.id == user_id, User.deleted_at.is_(None)).scalar()
 
     def is_user_exist_by_email(self, email: str) -> bool:
         """Checks if a user exists by email"""
+        # add a filter to exclude soft deleted entities
         # scalar : pour retourner qu'un element dans sqlalchemy
-        return self.db_session.query(exists().where(User.email == email)).scalar()
-
-    # @exec_transaction
-    # def create_user(self, user_data: dict) -> User:
-    #     """Create a new user in db"""
-    #     new_user = User(**user_data)
-    #     self.db_session.add(new_user)
-    #     return new_user
-
-    # @exec_transaction
-    # def update_user(self, user_id: int, update_data: dict) -> User:
-    #     """Updates a user with updated data"""
-    #     user = self.get_by_id(user_id)
-    #     if not user:
-    #         raise Exception("User not found")
-    #     for key, value in update_data.items():
-    #         setattr(user, key, value)
-    #     return user
-
-    # @exec_transaction
-    # def delete_user(self, user_id: int) -> bool:
-    #     """Deletes a user by their ID"""
-    #     user = self.get_by_id(user_id)
-    #     if not user:
-    #         raise Exception("User not found")
-    #     self.db_session.delete(user)
+        # return self.db_session.query(exists().where(User.email == email)).scalar()
+        return self.db_session.query(exists().where(User.email == email, User.deleted_at.is_(None))).scalar()
