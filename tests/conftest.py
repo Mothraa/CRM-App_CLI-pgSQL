@@ -1,7 +1,8 @@
 import pytest
 import datetime
 
-from my_app.services.user_service import UserService  # Assure-toi d'importer UserService correctement
+from sqlalchemy import Column, Integer, String, DateTime
+
 from my_app.models import RoleType
 
 
@@ -15,12 +16,6 @@ def mock_session(mocker):
     session.commit = mocker.Mock()
     session.rollback = mocker.Mock()
     return session
-
-
-@pytest.fixture
-def user_service(mock_session):
-    """Fixture for creating an UserService instance with a mocked session"""
-    return UserService(session=mock_session)
 
 
 @pytest.fixture
@@ -43,6 +38,17 @@ def mock_time(monkeypatch):
 def mock_user(monkeypatch):
     """Fixture to mock a user"""
     class MockUser:
+
+        id = Column(Integer)
+        deleted_at = Column(DateTime)
+        # email = None
+        # password_hashed = None
+        # first_name = None
+        # last_name = None
+        # role = None
+        # created_at = None
+        # updated_at = None
+
         def __init__(self, user_id, email="michel@test.com", password="hashed_password",
                      first_name="Michel", last_name="LeTesteur", role=RoleType.admin):
             self.id = user_id
@@ -51,4 +57,7 @@ def mock_user(monkeypatch):
             self.first_name = first_name
             self.last_name = last_name
             self.role = role
-    return MockUser(user_id=8)
+            self.created_at = None
+            self.updated_at = None
+            self.deleted_at = None
+    return MockUser(user_id=8)  # on retourne une instance
