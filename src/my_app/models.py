@@ -1,29 +1,12 @@
-import os
 from datetime import datetime
-import pytz
 from enum import Enum
 
-import yaml
-from dotenv import load_dotenv
 from sqlalchemy import String, Float, DateTime, ForeignKey, Enum as SQLAEnum, MetaData
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column
 from sqlalchemy.ext.declarative import as_declarative
 
 
-# TODO : ne pas lire plusieurs fois les fichiers de param, a centraliser au démarrage de l'app
-# chargement du nom du schema depuis l'environnement (.env)
-load_dotenv()
-DATABASE_SCHEMA = os.getenv("DATABASE_SCHEMA")
 metadata_obj = MetaData(schema=DATABASE_SCHEMA)
-
-# TODO : ne pas lire plusieurs fois les fichiers de param, a centraliser au démarrage de l'app
-# récupération de la time_zone depuis le fichier config.yaml
-with open("config.yaml", "r") as config_file:
-    config = yaml.safe_load(config_file)
-TIME_ZONE_NAME = config['global']['TIME_ZONE']
-TIME_ZONE = pytz.timezone(TIME_ZONE_NAME)
-
-
 # # décorateur sqlalchemy pour rendre la class déclarative => champs et methods en commun aux class enfant.
 # @as_declarative()
 class Base(DeclarativeBase):

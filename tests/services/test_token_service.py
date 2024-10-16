@@ -2,7 +2,6 @@ import jwt
 import pytest
 
 from datetime import timedelta
-# from jwt import ExpiredSignatureError, InvalidTokenError
 from my_app.services.token_service import TokenManager
 
 # TODO ajouter des tests liés a un mauvais param (mauvais algo, absence secret_key, lifetime négatif,...)
@@ -18,7 +17,7 @@ def token_manager_fixture(monkeypatch):
 
     # surcharge de la configuration
     token_manager.SECRET_KEY = "fake_secret_key"
-    token_manager.ALGORITHMS = "HS256"
+    token_manager.TOKEN_ALGORITHMS = "HS256"
     token_manager.ACCESS_TOKEN_LIFETIME = 10  # minutes
     token_manager.REFRESH_TOKEN_LIFETIME = 720  # minutes
 
@@ -45,7 +44,8 @@ def test_generate_access_token(token_manager_fixture, monkeypatch, mock_time, mo
     # décodage du token avec le temps figé également
     monkeypatch.setattr("jwt.api_jwt.datetime", MockDateTime)
 
-    decoded_token = jwt.decode(token, token_manager_fixture.SECRET_KEY, algorithms=[token_manager_fixture.ALGORITHMS])
+    decoded_token = jwt.decode(token, token_manager_fixture.SECRET_KEY,
+                               algorithms=[token_manager_fixture.TOKEN_ALGORITHMS])
 
     assert decoded_token["user_id"] == mock_user.id
     assert decoded_token["type"] == "access"
@@ -74,7 +74,8 @@ def test_generate_refresh_token(token_manager_fixture, monkeypatch, mock_time, m
     # décodage du token avec le temps figé également
     monkeypatch.setattr("jwt.api_jwt.datetime", MockDateTime)
 
-    decoded_token = jwt.decode(token, token_manager_fixture.SECRET_KEY, algorithms=[token_manager_fixture.ALGORITHMS])
+    decoded_token = jwt.decode(token, token_manager_fixture.SECRET_KEY,
+                               algorithms=[token_manager_fixture.TOKEN_ALGORITHMS])
 
     assert decoded_token["user_id"] == mock_user.id
     assert decoded_token["type"] == "refresh"
@@ -106,7 +107,7 @@ def test_verify_token_expired(token_manager_fixture, mock_user, mock_time):
         "exp": mock_time - timedelta(minutes=1),  # token expiré il y a 1 min
         "iat": mock_time - timedelta(minutes=11),  # token généré il y a 11 min
         "type": "access"
-    }, token_manager_fixture.SECRET_KEY, algorithm=token_manager_fixture.ALGORITHMS)
+    }, token_manager_fixture.SECRET_KEY, algorithm=token_manager_fixture.TOKEN_ALGORITHMS)
 
     decoded_payload = token_manager_fixture.verify_token(expired_token)
     # TODO : ajouter des exceptions
@@ -153,7 +154,7 @@ def test_refresh_access_token_valid(token_manager_fixture, monkeypatch, mock_use
 
     new_access_token = token_manager_fixture.refresh_access_token(refresh_token)
     decoded_access_token = jwt.decode(new_access_token, token_manager_fixture.SECRET_KEY,
-                                      algorithms=[token_manager_fixture.ALGORITHMS])
+                                      algorithms=[token_manager_fixture.TOKEN_ALGORITHMS])
 
     assert decoded_access_token["user_id"] == mock_user.id
     assert decoded_access_token["type"] == "access"
@@ -171,7 +172,7 @@ def test_refresh_access_token_expired(token_manager_fixture, mock_user, mock_tim
         "exp": mock_time - timedelta(minutes=1),  # token expiré il y a 1 min
         "iat": mock_time - timedelta(minutes=721),  # token généré il y a 12h et 1 min
         "type": "refresh"
-    }, token_manager_fixture.SECRET_KEY, algorithm=token_manager_fixture.ALGORITHMS)
+    }, token_manager_fixture.SECRET_KEY, algorithm=token_manager_fixture.TOKEN_ALGORITHMS)
 
     new_access_token = token_manager_fixture.refresh_access_token(expired_refresh_token)
 

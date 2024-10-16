@@ -1,11 +1,11 @@
-import os
 from datetime import datetime, timedelta
-import pytz
 
 import jwt
-import yaml
 from jwt import ExpiredSignatureError, InvalidTokenError
-from dotenv import load_dotenv
+
+from my_app.config_loader import (SECRET_KEY, TIME_ZONE,
+                                TOKEN_ALGORITHMS, ACCESS_TOKEN_LIFETIME, REFRESH_TOKEN_LIFETIME
+                                )
 
 
 class TokenManager:
@@ -13,25 +13,19 @@ class TokenManager:
 
     SECRET_KEY = None
     timezone = None
-    ALGORITHMS = None
+    TOKEN_ALGORITHMS = None
     ACCESS_TOKEN_LIFETIME = None
     REFRESH_TOKEN_LIFETIME = None
 
     def __init__(self):
         """Initializes TokenManager with configuration settings."""
-        load_dotenv()
-        self.SECRET_KEY = os.getenv('SECRET_KEY')
+        self.SECRET_KEY = SECRET_KEY
 
-        # On charge la configuration depuis config.yaml
-        with open("config.yaml", "r") as config_file:
-            config = yaml.safe_load(config_file)
+        self.timezone = TIME_ZONE
 
-        TIME_ZONE_NAME = config['global']['TIME_ZONE']
-        self.timezone = pytz.timezone(TIME_ZONE_NAME)
-
-        self.ALGORITHMS = config['jwt']['ALGORITHMS']
-        self.ACCESS_TOKEN_LIFETIME = config['jwt']['ACCESS_TOKEN_LIFETIME']  # en minutes
-        self.REFRESH_TOKEN_LIFETIME = config['jwt']['REFRESH_TOKEN_LIFETIME']  # en minutes
+        self.TOKEN_ALGORITHMS = TOKEN_ALGORITHMS
+        self.ACCESS_TOKEN_LIFETIME = ACCESS_TOKEN_LIFETIME
+        self.REFRESH_TOKEN_LIFETIME = REFRESH_TOKEN_LIFETIME
 
     def generate_access_token(self, user_id):
         """Generate an access token for one user"""
@@ -44,7 +38,7 @@ class TokenManager:
             'iat': int(now.timestamp()),
             "type": "access"
         }
-        access_token = jwt.encode(access_payload, self.SECRET_KEY, algorithm=self.ALGORITHMS)
+        access_token = jwt.encode(access_payload, self.SECRET_KEY, algorithm=self.TOKEN_ALGORITHMS)
 
         return access_token
 
@@ -59,14 +53,14 @@ class TokenManager:
             'iat': int(now.timestamp()),
             'type': 'refresh'
         }
-        refresh_token = jwt.encode(refresh_payload, self.SECRET_KEY, algorithm=self.ALGORITHMS)
+        refresh_token = jwt.encode(refresh_payload, self.SECRET_KEY, algorithm=self.TOKEN_ALGORITHMS)
 
         return refresh_token
 
     def verify_token(self, token):
         """Verify the JWT token (access or refresh)"""
         try:
-            decoded_payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.ALGORITHMS])
+            decoded_payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.TOKEN_ALGORITHMS])
             return decoded_payload
         except ExpiredSignatureError:
             print("Le token a expiré")
@@ -78,7 +72,7 @@ class TokenManager:
     def refresh_access_token(self, refresh_token):
         """Generate a new access token if the refresh token is valid"""
         try:
-            decoded_refresh_token = jwt.decode(refresh_token, self.SECRET_KEY, algorithms=[self.ALGORITHMS])
+            decoded_refresh_token = jwt.decode(refresh_token, self.SECRET_KEY, algorithms=[self.TOKEN_ALGORITHMS])
 
             # On vérifie que c'est bien un refresh token
             if decoded_refresh_token.get('type') != 'refresh':

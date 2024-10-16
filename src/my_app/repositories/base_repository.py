@@ -5,22 +5,14 @@ This file contains :
     the decorator for executing transactions (exec_transaction)
 """
 
-import yaml
 from datetime import datetime
-import pytz
 from functools import wraps
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from typing import TypeVar, Generic, List, Optional, Type
 
-
-# TODO : ne pas lire plusieurs fois les fichiers de param, a centraliser au démarrage de l'app
-# récupération de la time_zone depuis le fichier config.yaml
-with open("config.yaml", "r") as config_file:
-    config = yaml.safe_load(config_file)
-TIME_ZONE_NAME = config['global']['TIME_ZONE']
-TIME_ZONE = pytz.timezone(TIME_ZONE_NAME)
+from my_app.config_loader import TIME_ZONE
 
 
 T = TypeVar('T')
