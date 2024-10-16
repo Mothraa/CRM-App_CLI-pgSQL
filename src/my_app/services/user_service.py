@@ -34,6 +34,7 @@ class UserService:
 
     def add_user(self, user_data: dict, current_user: User) -> User:
         """Method to add a new user. Hash the given password"""
+
         # on regarde si l'utilisateur courant a la permission de créer un compte.
         has_permission(current_user, 'add-user')  # lève une exception si NOK
 
@@ -58,14 +59,14 @@ class UserService:
         return new_user
 
     def update_user(self, user_id: int, update_data: dict, current_user: User) -> User:
-        """
+        """Method to update an existing user, need "update-user" permission
         param :
             user_id : the id of the user to update
             update_data : ...
             current_user : active authentified current user
         """
         # on regarde si l'utilisateur courant a la permission de mettre à jour un compte.
-        has_permission(current_user, 'update-user')  # lève une exception si NOK
+        has_permission(current_user, "update-user")  # lève une exception si NOK
 
         # On valide les données d'entrée avec Pydantic
         user_update = UserUpdateSchema(**update_data)
@@ -76,8 +77,8 @@ class UserService:
         # Si un nouveau password est fourni, on regarde les permissions et on le hache
         if "password" in update_data:
             hashed_password = self.hash_password(user_update.password)
-            update_data['password_hash'] = hashed_password
-            del update_data['password']
+            update_data["password_hash"] = hashed_password
+            del update_data["password"]
 
         # on applique le reste des modifications ;
         # exclude_unset : on ne retourne pas les champs qui n'ont pas été mis à jour
@@ -90,36 +91,12 @@ class UserService:
 
     def delete_user(self, user_id: int, current_user: User):
         # on regarde si l'utilisateur courant a la permission de supprimer un compte.
-        has_permission(current_user, 'delete-user')  # lève une exception si NOK
+        has_permission(current_user, "delete-user")  # lève une exception si NOK
         # On récupère l'utilisateur à supprimer
         user_to_delete = self.user_repository.get_by_id(user_id)
 
-        # rien a valider du coté de pydantic
+        # ...rien a valider du coté de pydantic...
 
         user_to_delete = self.user_repository.get_by_id(user_id)
         self.user_repository.delete(user_to_delete)
         # on ne retourne rien, par cohérence avec le repository et pour ne pas exposer les données
-
-    # TODO : a déplacer dans seed_test_users.py une fois le validator ajouté
-    def create_test_accounts(self):
-        """Create a test account for each user role. ONLY FOR TEST/DEBUG, DON'T USE IN PRODUCTION"""
-        # liste des utilisateurs créés retournés par la methode
-        created_users = []
-        try:
-            roles = [RoleType.admin, RoleType.manage, RoleType.sales, RoleType.support]
-            for role in roles:
-                email = f"test_{role.value}@example.com"
-                plain_password = f"password_{role.value}"  # Mot de passe simple pour les tests
-                first_name = "Test"
-                last_name = f"User_{role.value}"
-
-                user = self.create_user(email, plain_password, first_name, last_name, role)
-                created_users.append(user)
-                print(f"Utilisateur de test créé : {user.email} avec le rôle {user.role}")
-
-            return created_users
-
-        except Exception as e:
-            self.session.rollback()
-            print(f"Erreur lors de la création des comptes de test : {e}")
-            return None

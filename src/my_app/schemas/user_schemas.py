@@ -30,9 +30,12 @@ class UserAddSchema(BaseModel):
             raise ValueError(f"Password must contain at least one special character : {string.punctuation}")
         return value
 
-    class Config:
+    model_config = {
         # permet de passer une session sqlalchemy a pydantic, utile dans le cas de serialisation d'objets ORM
-        orm_mode = True
+        "from_attributes": True,
+        # permet l'utilisation des nom d'attribut du model en plus des alias de champ pydantic
+        "populate_by_name": True
+    }
 
 
 class UserUpdateSchema(BaseModel):
@@ -43,7 +46,9 @@ class UserUpdateSchema(BaseModel):
     last_name: Optional[str] = Field(None, max_length=100, description="Last name can't exceed 100 characters")
     role: Optional[RoleType] = None
 
-
-class UserDeleteSchema(BaseModel):
-    """Schema to validate data for user delete"""
-    pass
+    model_config = {
+        # permet de passer une session sqlalchemy a pydantic, utile dans le cas de serialisation d'objets ORM
+        "from_attributes": True,
+        # permet l'utilisation des nom d'attribut du model en plus des alias de champ pydantic
+        "populate_by_name": True
+    }

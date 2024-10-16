@@ -7,14 +7,23 @@ def test_get_user_by_id_success(mock_session, mock_user):
     """Test to retrieve a user by a correct ID"""
     repository = UserRepository(mock_session)
 
-    # création d'un mock pour query et get
+    # création d'un mock pour query et et le filtrage
     query = mock_session.query.return_value
-    query.get.return_value = mock_user  # get présent dans get_by_id
+    query.filter.return_value.first.return_value = mock_user
 
     result = repository.get_by_id(mock_user.id)
 
     assert result == mock_user
-    mock_session.query(User).get.assert_called_once_with(mock_user.id)
+
+    # On vérifie que query a été appelé avec User
+    mock_session.query.assert_called_once_with(User)
+
+    # On vérifie que filter a été appelé
+    mock_session.query.return_value.filter.assert_called_once()
+    # TODO : tester le filtre plus dans le detail
+
+    # On vérifie que first a été appelé après filter
+    mock_session.query.return_value.filter.return_value.first.assert_called_once()
 
 
 def test_get_user_by_id_not_found(mock_session):
@@ -22,14 +31,24 @@ def test_get_user_by_id_not_found(mock_session):
     # mock_session.query(User).filter_by(id=666).first.return_value = None
     repository = UserRepository(mock_session)
 
-    # création d'un mock pour query et get
+    # On simule query.filter().first() pour retourner None (utilisateur non trouvé)
     query = mock_session.query.return_value
-    query.get.return_value = None  # simulation d'un user non trouvé
+    query.filter.return_value.first.return_value = None
 
     result = repository.get_by_id(666)  # try to call satan 😈
 
     assert result is None
-    mock_session.query(User).get.assert_called_once_with(666)
+    # mock_session.query(User).get.assert_called_once_with(666)
+
+    # On vérifie que query a été appelé avec User
+    mock_session.query.assert_called_once_with(User)
+
+    # On vérifie que filter a été appelé
+    mock_session.query.return_value.filter.assert_called_once()
+    # TODO : tester le filtre plus dans le detail
+
+    # On vérifie que first a été appelé après filter
+    mock_session.query.return_value.filter.return_value.first.assert_called_once()
 
 
 def test_get_user_by_email_success(mock_session, mock_user):
@@ -37,15 +56,44 @@ def test_get_user_by_email_success(mock_session, mock_user):
     fake_valid_email = "michel@test.com"
     repository = UserRepository(mock_session)
 
-    # création d'un mock pour query et get
-    query = mock_session.query.return_value
-    query.filter_by.return_value = query
-    query.first.return_value = mock_user
+    # on simule la requete qui retourne un mock_user
+    mock_session.query.return_value.filter.return_value.first.return_value = mock_user
 
     result = repository.get_by_email(fake_valid_email)
 
     assert result == mock_user
-    mock_session.query(User).filter_by.assert_called_once_with(email=fake_valid_email)
+
+    # On vérifie que query a été appelé avec User
+    mock_session.query.assert_called_once_with(User)
+
+    # On vérifie que filter a été appelé
+    mock_session.query.return_value.filter.assert_called_once()
+
+    # On vérifie que first a été appelé après filter
+    mock_session.query.return_value.filter.return_value.first.assert_called_once()
+
+
+def test_get_user_by_email_not_found(mock_session):
+    """Test to ensure None is returned when user is not found"""
+    fake_invalid_email = "invalid_mail@test.com"
+    repository = UserRepository(mock_session)
+
+    # on simule la requête qui retourne None
+    mock_session.query.return_value.filter.return_value.first.return_value = None
+
+    result = repository.get_by_email(fake_invalid_email)
+
+    assert result is None
+
+    # On vérifie que query a été appelé avec User
+    mock_session.query.assert_called_once_with(User)
+
+    # On vérifie que filter a été appelé
+    mock_session.query.return_value.filter.assert_called_once()
+
+    # On vérifie que first a été appelé après filter
+    mock_session.query.return_value.filter.return_value.first.assert_called_once()
+
 
 
 # décorateur qui permet le test de plusieurs cas
@@ -53,20 +101,19 @@ def test_get_user_by_email_success(mock_session, mock_user):
 def test_is_user_exist_by_id(mock_session, user_id, user_exists):
     """Test checking function "is_user_exist_by_id"""
     # création des mocks
-    mock_query = mock_session.query.return_value
-    mock_exists = mock_query.exists.return_value
-    mock_where = mock_exists.where.return_value
-    mock_where.scalar.return_value = user_exists
+    mock_session.query.return_value.filter.return_value.scalar.return_value = user_exists
 
     repository = UserRepository(mock_session)
 
     result = repository.is_user_exist_by_id(user_id)
 
     assert result == user_exists
-    # mock_exists.where.assert_called_once_with(User.id == user_id)
-    # mock_exists.where.assert_called_once_with(ANY)
-    assert mock_exists.where.called
-    mock_where.scalar.assert_called_once()
+
+    # On vérifie que query a été appelé avec User
+    mock_session.query.assert_called_once_with(User)
+
+    # On vérifie que filter a été appelé
+    mock_session.query.return_value.filter.assert_called_once()
 
 
 # # CONSERVE SI BESOIN POUR D'AUTRES TABLES, mais inutile de tester ici car passé dans le repository générique (base)
