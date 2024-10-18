@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 
 from my_app.repositories.user_repository import UserRepository
 from my_app.models import User, RoleType
-from my_app.schemas.user_schemas import UserAddSchema, UserUpdateSchema
+from my_app.schemas.user_schemas import UserAuthSchema, UserAddSchema, UserUpdateSchema
 from my_app.permissions import has_permission  # , has_any_permission, has_all_permission
-
+from my_app.exceptions import UserNotFoundError, InvalidPasswordError, AuthenticationError
 
 class UserService:
     def __init__(self, session: Session, user_repository: UserRepository):
@@ -32,9 +32,23 @@ class UserService:
         except VerifyMismatchError:
             return False
 
+    def authenticate_user(self, user_email, password):
+        """Authenticate user, return User instance if OK, or None"""
+        # On valide le format des données d'entrée avec Pydantic
+        UserAuthSchema(email=user_email, password=password)
+
+        user = self.user_repository.get_by_email(user_email)
+        # user = self.user_repository.get_by_email(self.session, user_email)
+        if user is None:
+            raise UserNotFoundError(f"No user with email {user_email}")
+
+        if not self.verify_password(user.password_hash, password):
+            raise InvalidPasswordError("Password invalid")
+
+        return user  # on retourne l'utilisateur si le mot de passe est OK
+
     def add_user(self, user_data: dict, current_user: User) -> User:
         """Method to add a new user. Hash the given password"""
-
         # on regarde si l'utilisateur courant a la permission de créer un compte.
         has_permission(current_user, 'add-user')  # lève une exception si NOK
 

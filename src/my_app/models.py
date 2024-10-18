@@ -5,15 +5,16 @@ from sqlalchemy import String, Float, DateTime, ForeignKey, Enum as SQLAEnum, Me
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column
 from sqlalchemy.ext.declarative import as_declarative
 
+from .config_loader import TIME_ZONE, DATABASE_SCHEMA
 
 metadata_obj = MetaData(schema=DATABASE_SCHEMA)
+
+
 # # décorateur sqlalchemy pour rendre la class déclarative => champs et methods en commun aux class enfant.
 # @as_declarative()
 class Base(DeclarativeBase):
     # pour stocker les tables dans le schema DATABASE_SCHEMA
     metadata = metadata_obj
-
-
     # # champs en commun entre toutes les tables
     # id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     # created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=False,

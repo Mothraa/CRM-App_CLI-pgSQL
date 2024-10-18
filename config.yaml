@@ -1,4 +1,5 @@
 global:
+    DEBUG_MODE: False # True for activate debugging mode
     TIME_ZONE: "Europe/Paris"
 
 jwt:
