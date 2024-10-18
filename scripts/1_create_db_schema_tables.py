@@ -20,7 +20,7 @@ ECHO = False
 class DatabaseInit:
     def __init__(self):
         self.engine = None
-
+        # TODO : charger config_loader.py
         load_dotenv(override=True)
         self.DATABASE_ADMIN_USER = os.getenv("DATABASE_ADMIN_USER")
         self.DATABASE_ADMIN_PASSWORD = os.getenv("DATABASE_ADMIN_PASSWORD")

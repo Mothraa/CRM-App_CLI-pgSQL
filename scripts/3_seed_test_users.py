@@ -1,58 +1,96 @@
-import os
 import sys
-from dotenv import load_dotenv
-from sqlalchemy import create_engine, URL
-from sqlalchemy.orm import Session
+import os
+from getpass import getpass
 
-src_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "src")
-if src_path not in sys.path:
-    sys.path.append(src_path)
+# on inclus 'src' dans le PYTHONPATH
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
 
 from my_app.services.user_service import UserService
+from my_app.repositories.user_repository import UserRepository
+from my_app.db_config import get_session
+from my_app.models import RoleType
 
-# Pour activer l'option echo de SQLAlchemy (affichage du SQL, très verbeux)
-ECHO = False
+
+def prompt_admin_login():
+    """Demander les informations d'identification de l'admin."""
+    email = input("Entrez votre email admin : ")
+    password = getpass("Entrez votre mot de passe admin : ")
+    return email, password
 
 
-class TestAccounts:
-    def __init__(self):
-        load_dotenv(override=True)
-        self.DATABASE_ADMIN_USER = os.getenv("DATABASE_APP_USER")
-        self.DATABASE_ADMIN_PASSWORD = os.getenv("DATABASE_APP_PASSWORD")
-        self.DATABASE_HOST = os.getenv("DATABASE_HOST")
-        self.DATABASE_PORT = os.getenv("DATABASE_PORT")
-        self.DATABASE_NAME = os.getenv("DATABASE_NAME")
-        self.DATABASE_SCHEMA = os.getenv("DATABASE_SCHEMA")
-        self.SSL_MODE = os.getenv("SSL_MODE")
+def authenticate_admin(user_service, email, password):
+    """Authentifier l'utilisateur admin."""
+    try:
+        admin_user = user_service.authenticate_user(email, password)
+        if admin_user.role != RoleType.admin:
+            print("Erreur : Cet utilisateur n'a pas les droits administratifs.")
+            sys.exit(1)
+        return admin_user
+    except Exception as e:
+        print(f"Erreur d'authentification : {e}")
+        sys.exit(1)
 
-        # URL pour psycopg2 (utilisé pour la connexion)
-        self.new_psycopg2_url_object = URL.create(
-            "postgresql+psycopg2",
-            username=self.DATABASE_ADMIN_USER,
-            password=self.DATABASE_ADMIN_PASSWORD,
-            host=self.DATABASE_HOST,
-            port=self.DATABASE_PORT,
-            database=self.DATABASE_NAME,
-            query={"sslmode": self.SSL_MODE}
-        )
 
-    def create_test_accounts(self):
-        """Create test user accounts (one for each role)"""
-        engine = create_engine(self.new_psycopg2_url_object, echo=ECHO, future=True)
+def create_test_accounts(session, admin_user):
+    """Créer des comptes utilisateurs pour chaque rôle de test, et les enregistrer en base de données."""
 
-        # Création des comptes de test dans une session
-        with Session(engine) as session:
-            # note : création de la session dans un context pour ne pas avoir besoin de la fermer
-            try:
-                user_service = UserService(session)
-                user_service.create_test_accounts()
-                session.commit()
-                print("Création des comptes de test => OK")
-            except Exception as e:
-                session.rollback()
-                print(f"Erreur lors de la création des comptes de test : {e}")
+    # Initialisation du repository et du service utilisateur
+    user_repository = UserRepository(session)
+    user_service = UserService(session, user_repository)
+
+    # Liste des rôles à créer pour les comptes de test
+    roles = [RoleType.admin, RoleType.manage, RoleType.sales, RoleType.support]
+    created_users = []
+
+    try:
+        for role in roles:
+            # TODO : ajouter ces informations a l'environnement de dev (.env.development)
+            email = f"{role.value}@test.com"
+            password = "Super_passwordQuiR3spectLéContraintes!!"
+            first_name = "test"
+            last_name = f"user_{role.value}"
+
+            # Encapsulation des données dans un dictionnaire
+            user_data = {
+                "email": email,
+                "password": password,
+                "first_name": first_name,
+                "last_name": last_name,
+                "role": role
+            }
+
+            # Création de l'utilisateur via le service avec admin_user comme current_user
+            user = user_service.add_user(user_data=user_data, current_user=admin_user)
+            created_users.append(user)
+            print(f"Utilisateur de test créé : {user.email} avec le rôle {user.role}")
+
+        session.commit()  # Commit les modifications une fois que tous les utilisateurs ont été créés
+        print("Création des comptes utilisateurs test => OK")
+        return created_users
+
+    except Exception as e:
+        session.rollback()  # En cas d'erreur, annuler les modifications
+        print(f"Erreur lors de la création des comptes test : {e}")
+        return None
 
 
 if __name__ == "__main__":
-    test_accounts = TestAccounts()
-    test_accounts.create_test_accounts()
+    # Créer une session pour interagir avec la base de données via db_config
+    session = get_session()
+
+    try:
+        # Demander les informations d'identification admin
+        email, password = prompt_admin_login()
+
+        # Initialisation de UserService pour authentifier l'administrateur
+        user_repository = UserRepository(session)
+        user_service = UserService(session, user_repository)
+
+        # Authentification de l'administrateur
+        admin_user = authenticate_admin(user_service, email, password)
+
+        # Création des comptes utilisateurs test
+        create_test_accounts(session, admin_user)
+
+    finally:
+        session.close()
