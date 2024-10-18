@@ -4,8 +4,8 @@ import jwt
 from jwt import ExpiredSignatureError, InvalidTokenError
 
 from my_app.config_loader import (SECRET_KEY, TIME_ZONE,
-                                TOKEN_ALGORITHMS, ACCESS_TOKEN_LIFETIME, REFRESH_TOKEN_LIFETIME
-                                )
+                                  TOKEN_ALGORITHMS, ACCESS_TOKEN_LIFETIME, REFRESH_TOKEN_LIFETIME,
+                                  )
 
 
 class TokenManager:
