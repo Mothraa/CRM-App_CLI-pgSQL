@@ -1,7 +1,7 @@
 import pytest
 import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, DateTime
 
 from my_app.models import RoleType
 
@@ -61,3 +61,13 @@ def mock_user(monkeypatch):
             self.updated_at = None
             self.deleted_at = None
     return MockUser(user_id=8)  # on retourne une instance
+
+
+# utilisateur authentifié (de plus haut niveau), principalement pour le test des controleurs/vues
+@pytest.fixture
+def mock_authenticated_user(mock_user):
+    return {
+        'user_id': mock_user.id,
+        'email': mock_user.email,
+        'role': mock_user.role
+    }
