@@ -4,5 +4,6 @@ global:
 
 jwt:
     TOKEN_ALGORITHMS: "HS256"
+    TOKEN_LOCAL_FILE_PATH: "data/tokens.yaml"
     ACCESS_TOKEN_LIFETIME: 10 # in minutes, 10 min by default
     REFRESH_TOKEN_LIFETIME: 720 # in minutes, 720 min (12 hours) by default
