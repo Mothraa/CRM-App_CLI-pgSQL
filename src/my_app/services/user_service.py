@@ -3,10 +3,11 @@ from argon2.exceptions import VerifyMismatchError
 from sqlalchemy.orm import Session
 
 from my_app.repositories.user_repository import UserRepository
-from my_app.models import User, RoleType
+from my_app.models import User
 from my_app.schemas.user_schemas import UserAuthSchema, UserAddSchema, UserUpdateSchema
 from my_app.permissions import has_permission  # , has_any_permission, has_all_permission
-from my_app.exceptions import UserNotFoundError, InvalidPasswordError, AuthenticationError
+from my_app.exceptions import UserNotFoundError, InvalidPasswordError
+
 
 class UserService:
     def __init__(self, session: Session, user_repository: UserRepository):
@@ -32,6 +33,13 @@ class UserService:
         except VerifyMismatchError:
             return False
 
+    def get_user_by_id(self, user_id: int):
+        """Récupérer un utilisateur par son ID"""
+        user = self.user_repository.get_by_id(user_id)  # Appel au repository
+        if not user:
+            raise UserNotFoundError(f"Pas d'utilisateur avec l'ID : {user_id}")
+        return user
+
     def authenticate_user(self, user_email, password):
         """Authenticate user, return User instance if OK, or None"""
         # On valide le format des données d'entrée avec Pydantic
@@ -40,7 +48,7 @@ class UserService:
         user = self.user_repository.get_by_email(user_email)
         # user = self.user_repository.get_by_email(self.session, user_email)
         if user is None:
-            raise UserNotFoundError(f"No user with email {user_email}")
+            raise UserNotFoundError(f"Pas d'utilisateur avec l'email : {user_email}")
 
         if not self.verify_password(user.password_hash, password):
             raise InvalidPasswordError("Password invalid")
