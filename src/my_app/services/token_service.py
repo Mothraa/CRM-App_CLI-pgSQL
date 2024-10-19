@@ -1,11 +1,15 @@
+import os
 from datetime import datetime, timedelta
 
+import yaml
 import jwt
 from jwt import ExpiredSignatureError, InvalidTokenError
 
 from my_app.config_loader import (SECRET_KEY, TIME_ZONE,
-                                  TOKEN_ALGORITHMS, ACCESS_TOKEN_LIFETIME, REFRESH_TOKEN_LIFETIME,
+                                  TOKEN_ALGORITHMS, ACCESS_TOKEN_LIFETIME,
+                                  REFRESH_TOKEN_LIFETIME, TOKEN_LOCAL_FILE_PATH,
                                   )
+from my_app.exceptions import TokenDeleteError
 
 
 class TokenManager:
@@ -26,6 +30,8 @@ class TokenManager:
         self.TOKEN_ALGORITHMS = TOKEN_ALGORITHMS
         self.ACCESS_TOKEN_LIFETIME = ACCESS_TOKEN_LIFETIME
         self.REFRESH_TOKEN_LIFETIME = REFRESH_TOKEN_LIFETIME
+        # TODO : stocker le token dans le repertoire user de l'OS
+        self.TOKEN_LOCAL_FILE_PATH = TOKEN_LOCAL_FILE_PATH
 
     def generate_access_token(self, user_id):
         """Generate an access token for one user"""
@@ -39,7 +45,6 @@ class TokenManager:
             "type": "access"
         }
         access_token = jwt.encode(access_payload, self.SECRET_KEY, algorithm=self.TOKEN_ALGORITHMS)
-
         return access_token
 
     def generate_refresh_token(self, user_id):
@@ -56,6 +61,39 @@ class TokenManager:
         refresh_token = jwt.encode(refresh_payload, self.SECRET_KEY, algorithm=self.TOKEN_ALGORITHMS)
 
         return refresh_token
+
+    def save_tokens(self, access_token, refresh_token):
+        """Save the access and refresh tokens to YAML file"""
+        tokens = {
+            'access_token': access_token,
+            'refresh_token': refresh_token
+        }
+
+        # on créé le dossier si il n'existe pas
+        os.makedirs(os.path.dirname(self.TOKEN_LOCAL_FILE_PATH), exist_ok=True)
+
+        # sauvegarde du fichier
+        with open(self.TOKEN_LOCAL_FILE_PATH, 'w') as file:
+            yaml.dump(tokens, file)
+
+    def load_tokens(self):
+        """Load the access and refresh tokens from YAML file"""
+        if os.path.exists(self.TOKEN_LOCAL_FILE_PATH):
+            with open(self.TOKEN_LOCAL_FILE_PATH, 'r') as file:
+                tokens = yaml.safe_load(file)
+                return tokens
+        return None
+
+    def delete_tokens(self):
+        """Delete the YAML token file"""
+        # Vérifier si le fichier existe avant de tenter de le supprimer
+        if os.path.exists(self.TOKEN_LOCAL_FILE_PATH):
+            try:
+                os.remove(self.TOKEN_LOCAL_FILE_PATH)
+            except Exception as e:
+                raise TokenDeleteError("Erreur de suppression du fichier : ", self.TOKEN_LOCAL_FILE_PATH) from e
+        else:
+            raise TokenDeleteError("Le fichier n'existe pas, rien à supprimer", self.TOKEN_LOCAL_FILE_PATH)
 
     def verify_token(self, token):
         """Verify the JWT token (access or refresh)"""
