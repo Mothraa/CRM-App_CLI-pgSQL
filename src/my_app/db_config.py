@@ -33,4 +33,4 @@ def get_session():
     """Retourne une session SQLAlchemy basée sur l'engine"""
     engine = get_engine()
     session_local = sessionmaker(bind=engine)
-    return session_local() # on retourne une instance de session
+    return session_local()  # on retourne une instance de session
