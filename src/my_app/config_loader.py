@@ -31,5 +31,6 @@ with open(config_path, "r") as config_file:
     TIME_ZONE = pytz.timezone(TIME_ZONE_NAME)
 
     TOKEN_ALGORITHMS = config["jwt"]["TOKEN_ALGORITHMS"]
+    TOKEN_LOCAL_FILE_PATH = config["jwt"]["TOKEN_LOCAL_FILE_PATH"]
     ACCESS_TOKEN_LIFETIME = config["jwt"]["ACCESS_TOKEN_LIFETIME"]  # en minutes
     REFRESH_TOKEN_LIFETIME = config["jwt"]["REFRESH_TOKEN_LIFETIME"]  # en minutes
