@@ -17,7 +17,7 @@ class UserService:
             session => the SQLAlchemy session to manage the database
             user_repository => repository to manage user data/sqlalchemy operations
         """
-        self.session = session
+        self.session = session  # pas utilisé pour le moment
         self.user_repository = user_repository
         # initialisation du hachage de mot de passe avec Argon2 via argon2-cffi
         self.ph = PasswordHasher()
