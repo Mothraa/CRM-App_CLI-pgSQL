@@ -208,7 +208,7 @@ if __name__ == "__main__":
             sys.exit(1)
 
         # si le mdp indiqué est correct on demande confirmation pour la modification des privilèges
-        confirmation = input(f"Etes vous sur de vouloir modifier les privilèges de l'utilisateur '{new_user_username}' ? (y/n): ")
+        confirmation = input(f"Etes vous sur de vouloir modifier les privilèges de '{new_user_username}' ? (y/n): ")
 
         if confirmation.lower() == 'y':
             app_user_creator.grant_privileges(session, new_user_username)

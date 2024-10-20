@@ -10,20 +10,23 @@ from my_app.repositories.user_repository import UserRepository
 from my_app.db_config import get_session
 from my_app.models import RoleType
 
+# mot de passe par défaut indentique pour tous les comptes tests
+DEFAULT_PASSWORD = "Super_passwordQuiR3spectLéContraintes!!"
+
 
 def prompt_admin_login():
-    """Demander les informations d'identification de l'admin."""
-    email = input("Entrez votre email admin : ")
+    """Prompt to authentify app admin"""
+    email = input("Entrez votre email admin (compte de l'app) : ")
     password = getpass("Entrez votre mot de passe admin : ")
     return email, password
 
 
 def authenticate_admin(user_service, email, password):
-    """Authentifier l'utilisateur admin."""
+    """Authentify admin user"""
     try:
         admin_user = user_service.authenticate_user(email, password)
         if admin_user.role != RoleType.admin:
-            print("Erreur : Cet utilisateur n'a pas les droits administratifs.")
+            print("Erreur : Cet utilisateur n'est pas admin")
             sys.exit(1)
         return admin_user
     except Exception as e:
@@ -46,7 +49,7 @@ def create_test_accounts(session, admin_user):
         for role in roles:
             # TODO : ajouter ces informations a l'environnement de dev (.env.development)
             email = f"{role.value}@test.com"
-            password = "Super_passwordQuiR3spectLéContraintes!!"
+            password = DEFAULT_PASSWORD
             first_name = "test"
             last_name = f"user_{role.value}"
 
@@ -79,17 +82,14 @@ if __name__ == "__main__":
     session = get_session()
 
     try:
-        # Demander les informations d'identification admin
+        # Demande les infos d'identification admin
         email, password = prompt_admin_login()
 
-        # Initialisation de UserService pour authentifier l'administrateur
+        # init de UserService pour authentifier l'administrateur
         user_repository = UserRepository(session)
         user_service = UserService(session, user_repository)
-
-        # Authentification de l'administrateur
         admin_user = authenticate_admin(user_service, email, password)
 
-        # Création des comptes utilisateurs test
         create_test_accounts(session, admin_user)
 
     finally:
