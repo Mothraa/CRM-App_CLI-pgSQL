@@ -40,7 +40,9 @@ def test_insert_privilege(session):
     """Check if the user can INSERT data on tables"""
     try:
         now = datetime.now()
-        session.execute(text(f"INSERT INTO crm.\"user\" (email, password_hash, role, created_at) VALUES ('test@test.com', 'test_hash', '{RoleType.admin.value}', :created_at)"), {'created_at': now})
+        session.execute(text(f"INSERT INTO crm.\"user\" (email, password_hash, role, created_at) \
+                             VALUES ('test@test.com', 'test_hash', '{RoleType.admin.value}', :created_at)"),
+                        {'created_at': now})
         session.commit()
     except OperationalError as e:
         pytest.fail(f"L'utilisateur ne peut pas insérer des données: {e}")
@@ -56,7 +58,9 @@ def test_update_privilege(session):
     try:
         # on ajoute dans un premier temps une entité
         now = datetime.now()
-        session.execute(text(f"INSERT INTO crm.\"user\" (email, password_hash, role, created_at) VALUES ('test@test.com', 'test_hash', '{RoleType.admin.value}', :created_at)"), {'created_at': now})
+        session.execute(text(f"INSERT INTO crm.\"user\" (email, password_hash, role, created_at) \
+                             VALUES ('test@test.com', 'test_hash', '{RoleType.admin.value}', :created_at)"),
+                        {'created_at': now})
         session.commit()
 
         # test d'UPDATE
@@ -79,7 +83,9 @@ def test_delete_privilege(session):
     try:
         # on ajoute dans un premier temps une entité
         now = datetime.now()
-        session.execute(text(f"INSERT INTO crm.\"user\" (email, password_hash, role, created_at) VALUES ('test@test.com', 'test_hash', '{RoleType.admin.value}', :created_at)"), {'created_at': now})
+        session.execute(text(f"INSERT INTO crm.\"user\" (email, password_hash, role, created_at) \
+                             VALUES ('test@test.com', 'test_hash', '{RoleType.admin.value}', :created_at)"),
+                        {'created_at': now})
         session.commit()
 
         # Test delete
