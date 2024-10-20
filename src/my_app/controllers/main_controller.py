@@ -1,6 +1,4 @@
-
 from my_app.models import User
-from my_app.repositories.user_repository import UserRepository
 from my_app.services.user_service import UserService
 from my_app.exceptions import AuthenticationError
 from my_app.services.token_service import TokenManager
@@ -8,15 +6,14 @@ from my_app.services.token_service import TokenManager
 
 class MainController:
 
-    def __init__(self, session_local):
+    def __init__(self, user_service: UserService, token_manager: TokenManager):
         """
         param :
-            session_local : session SQLAlchemy
+            user_service : injecté pour gérer l'identification
+            token_manager : injecté pour gérer la génération et la validation des tokens JWT
         """
-        self.session = session_local
-        self.user_repository = UserRepository(self.session)
-        self.user_service = UserService(self.session, self.user_repository)
-        self.token_manager = TokenManager()
+        self.user_service = user_service
+        self.token_manager = token_manager
         # init, pas encore d'utilisateur authentifié
         self.authenticated_user = None
 
