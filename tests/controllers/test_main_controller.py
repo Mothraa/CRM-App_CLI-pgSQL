@@ -1,12 +1,13 @@
 import pytest
-from my_app.controllers.main_controller import MainController
+# from my_app.controllers.main_controller import MainController
+from my_app.dependencies import init_main_controller
 from my_app.exceptions import AuthenticationError
 
 
-# Utilisation du mock de session dans MainController
 @pytest.fixture
 def main_controller(mock_session):
-    return MainController(mock_session)
+    """mock of MainController through dependencies.init_main_controller"""
+    return init_main_controller(mock_session)
 
 
 # Test de l'authentification réussie
