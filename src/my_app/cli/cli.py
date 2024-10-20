@@ -1,7 +1,7 @@
 import click
 from my_app.db_config import get_session
-from my_app.controllers.main_controller import MainController
 from my_app.exceptions import AuthenticationError, LogoutError
+from my_app.dependencies import init_main_controller
 
 
 # Commande principale Click
@@ -11,12 +11,12 @@ def cli(ctx):
     # initialisation de la session
     session = get_session()
     ctx.ensure_object(dict)
-    ctx.obj['controller'] = MainController(session)
+    ctx.obj['controller'] = init_main_controller(session)
 
 
 # Commande d'authentification
 @cli.command(help="Authentificate the user with his email and password")
-@click.argument('email', metavar='<email utilisateur>', required=True)
+@click.argument('email', metavar='<user email>', required=True)
 @click.pass_context
 def login(ctx, email):
     """Authentificate the user"""
@@ -41,7 +41,6 @@ def logout(ctx):
     controller = ctx.obj['controller']
     try:
         controller.logout()
-        # Confirmation de la déconnexion
         click.echo("Déconnexion réussie.")
     except (Exception) as e:
         raise LogoutError(f"Erreur inattendue lors de la déconnexion : {str(e)}")
