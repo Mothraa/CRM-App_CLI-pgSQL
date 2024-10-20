@@ -30,7 +30,7 @@ class TokenManager:
         self.TOKEN_ALGORITHMS = TOKEN_ALGORITHMS
         self.ACCESS_TOKEN_LIFETIME = ACCESS_TOKEN_LIFETIME
         self.REFRESH_TOKEN_LIFETIME = REFRESH_TOKEN_LIFETIME
-        # TODO : stocker le token dans le repertoire user de l'OS
+        # TODO : stocker le token dans le repertoire user de l'OS / fichier .netrc (_netrc sous win)
         self.TOKEN_LOCAL_FILE_PATH = TOKEN_LOCAL_FILE_PATH
 
     def generate_access_token(self, user_id):
