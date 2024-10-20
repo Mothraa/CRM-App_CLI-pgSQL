@@ -3,7 +3,6 @@ from enum import Enum
 
 from sqlalchemy import String, Float, DateTime, ForeignKey, Enum as SQLAEnum, MetaData
 from sqlalchemy.orm import DeclarativeBase, relationship, Mapped, mapped_column
-from sqlalchemy.ext.declarative import as_declarative
 
 from .config_loader import TIME_ZONE, DATABASE_SCHEMA
 
@@ -15,12 +14,6 @@ metadata_obj = MetaData(schema=DATABASE_SCHEMA)
 class Base(DeclarativeBase):
     # pour stocker les tables dans le schema DATABASE_SCHEMA
     metadata = metadata_obj
-    # # champs en commun entre toutes les tables
-    # id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    # created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=False,
-    #                                              default=lambda: datetime.now(TIME_ZONE))
-    # updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=True)
-    # deleted_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
 class RoleType(str, Enum):
