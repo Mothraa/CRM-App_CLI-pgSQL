@@ -86,14 +86,14 @@ class TokenManager:
 
     def delete_tokens(self):
         """Delete the YAML token file"""
-        # Vérifier si le fichier existe avant de tenter de le supprimer
+        # on vérifie si le fichier existe avant de tenter de le supprimer
         if os.path.exists(self.TOKEN_LOCAL_FILE_PATH):
             try:
                 os.remove(self.TOKEN_LOCAL_FILE_PATH)
+                return True
             except Exception as e:
-                raise TokenDeleteError("Erreur de suppression du fichier : ", self.TOKEN_LOCAL_FILE_PATH) from e
-        else:
-            raise TokenDeleteError("Le fichier n'existe pas, rien à supprimer", self.TOKEN_LOCAL_FILE_PATH)
+                raise TokenDeleteError(f"Erreur de suppression du fichier : {self.TOKEN_LOCAL_FILE_PATH} : {e}")
+        return False
 
     def verify_token(self, token):
         """Verify the JWT token (access or refresh)"""
@@ -101,10 +101,10 @@ class TokenManager:
             decoded_payload = jwt.decode(token, self.SECRET_KEY, algorithms=[self.TOKEN_ALGORITHMS])
             return decoded_payload
         except ExpiredSignatureError:
-            print("Le token a expiré")
+            # print("Le token a expiré")
             return None
         except InvalidTokenError:
-            print("Token invalide")
+            # print("Token invalide")
             return None
 
     def refresh_access_token(self, refresh_token):
