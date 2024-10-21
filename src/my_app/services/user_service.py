@@ -34,7 +34,7 @@ class UserService:
             return False
 
     def get_user_by_id(self, user_id: int):
-        """Récupérer un utilisateur par son ID"""
+        """Retrieve a User by his ID"""
         user = self.user_repository.get_by_id(user_id)  # Appel au repository
         if not user:
             raise UserNotFoundError(f"Pas d'utilisateur avec l'ID : {user_id}")
@@ -112,6 +112,7 @@ class UserService:
         return updated_user
 
     def delete_user(self, user_id: int, current_user: User):
+        """Delete a User by his ID"""
         # on regarde si l'utilisateur courant a la permission de supprimer un compte.
         has_permission(current_user, "delete-user")  # lève une exception si NOK
         # On récupère l'utilisateur à supprimer
