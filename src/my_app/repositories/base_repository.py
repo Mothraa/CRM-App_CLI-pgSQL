@@ -6,36 +6,14 @@ This file contains :
 """
 
 from datetime import datetime
-from functools import wraps
 
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
 from typing import TypeVar, Generic, List, Optional, Type
 
 from my_app.config_loader import TIME_ZONE
-
+from my_app.decorators import exec_transaction
 
 T = TypeVar('T')
-
-
-# TODO : décorateur a déplacer dans autre fichier si jamais cela devenait a se complexifier
-def exec_transaction(func):
-    """Decorator to handle database transactions"""
-    @wraps(func)
-    def wrapper(self, *args, **kwargs):
-        try:
-            result = func(self, *args, **kwargs)
-            self.db_session.commit()
-            return result
-        except SQLAlchemyError as e:
-            self.db_session.rollback()
-            raise Exception(f"Transaction failed: {e}")
-        # pour les exceptions non liées aux transactions (pour qu'elles ne soient pas masquées)
-        except Exception:
-            # on fait quand même un rollback
-            self.db_session.rollback()
-            raise  # relance l'exception d'origine (par exemple "ID not found")
-    return wrapper
 
 
 # Interface générique pour les repositories
