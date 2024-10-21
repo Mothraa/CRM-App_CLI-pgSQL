@@ -1,14 +1,10 @@
 import click
-# from rich.console import Console
 from rich.traceback import install
-from rich.console import Console
-from rich.panel import Panel
 
 from my_app.db_config import get_session
 from my_app.exceptions import AuthenticationError, LogoutError
 from my_app.dependencies import init_main_controller
 from my_app.cli.customer_cli import customer
-# from my_app.decorators import requires_auth
 from my_app.utils.display_utils import display_authenticated_user
 
 install()  # activation des exceptions via rich
@@ -36,7 +32,7 @@ def cli(ctx):
         ctx.obj['authenticated_user'] = None
 
     # fonction d'affichage de l'utilisateur authentifié
-    if ctx.invoked_subcommand not in ["login", "logout"]: # on exclus l'affichage pour login et logout
+    if ctx.invoked_subcommand not in ["login", "logout"]:  # on exclus l'affichage pour login et logout
         display_authenticated_user(authenticated_user)
 
 
