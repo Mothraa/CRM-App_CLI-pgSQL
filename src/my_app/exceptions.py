@@ -37,3 +37,14 @@ class TokenDeleteError(Exception):
 
     def __str__(self):
         return f"{self.message}: {self.file_path}"
+
+
+# customer_service
+class CustomerNotFoundError(Exception):
+    """Raised when a customer is not found in db"""
+    def __init__(self, message: str):
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f"CustomerNotFoundError: {self.message}"
