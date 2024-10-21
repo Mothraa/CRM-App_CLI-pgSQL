@@ -1,6 +1,6 @@
 from my_app.models import User
 from my_app.services.user_service import UserService
-from my_app.exceptions import AuthenticationError
+from my_app.exceptions import AuthenticationError, InvalidPasswordError
 from my_app.services.token_service import TokenManager
 
 
@@ -29,6 +29,9 @@ class MainController:
             # sauvegarde des tokens dans un fichier yaml
             self.token_manager.save_tokens(access_token, refresh_token)
             return user
+        except InvalidPasswordError:
+            # Retourner None pour indiquer un échec d'authentification
+            return None
         except AuthenticationError as e:
             raise AuthenticationError(f"Échec de l'authentification : {e}")
         except Exception as e:
@@ -87,23 +90,11 @@ class MainController:
         self.authenticated_user = user
         return user
 
-    def recover_context_from_tokens(self):
-        """Récupère l'utilisateur et reconstitue le contexte à partir des tokens"""
-        tokens = self.token_manager.load_tokens()
-        if not tokens:
-            return None
-
-        access_token = tokens.get('access_token')
-        decoded_token = self.token_manager.verify_token(access_token)
-        if decoded_token:
-            return self._fetch_user_from_token(decoded_token)
-
-        return None
-
     def logout(self):
         """Logout the user and delete tokens"""
         # si nécessaire, réinit l'utilisateur authentifié
         if self.authenticated_user:
             self.authenticated_user = None
-        # Supprime le fichier de tokens
-        self.token_manager.delete_tokens()
+
+        # Supprime le fichier de tokens et retourne un bool
+        return self.token_manager.delete_tokens()
