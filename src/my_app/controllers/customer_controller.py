@@ -26,7 +26,7 @@ class CustomerController(BaseController):
         # on affecte l'utilisateur créateur en tant que contact vente par défaut
         customer_data.setdefault("contact_sales_id", user.id)
 
-        return super().create(customer_data, user)
+        return super().add(customer_data, user)
 
     def update(self, customer_id, customer_data: dict, user):
         check_permission(user, "update-customer")
