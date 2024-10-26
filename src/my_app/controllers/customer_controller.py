@@ -1,30 +1,52 @@
 from my_app.services.customer_service import CustomerService
+from my_app.controllers.base_controller import BaseController
+from my_app.services.user_service import UserService
+from my_app.exceptions import InvalidUserRole
+from my_app.permissions import check_permission
+from my_app.models import RoleType
 
 
-class CustomerController:
-    def __init__(self, customer_service: CustomerService):
-        self.customer_service = customer_service
+class CustomerController(BaseController):
+    def __init__(self, customer_service: CustomerService, user_service: UserService):
+        """Inherits common methods from BaseController"""
+        super().__init__(customer_service)
+        self.user_service = user_service
 
-    def list_customers(self, current_user):
-        """Retrieve all customers"""
-        customers = self.customer_service.get_all_customers()
-        return customers
+    def list(self, user):
+        check_permission(user, "view-customer")
+        return super().list()
 
-    def retrieve_customer(self, customer_id: int, current_user):
-        """Retrieve a customer by ID"""
-        customer = self.customer_service.get_customer_by_id(customer_id)
-        return customer
+    def get(self, customer_id: int, user):
+        """Retrieve a specific customer by ID"""
+        check_permission(user, "view-customer")
+        return super().get(customer_id)
 
-    def create_customer(self, customer_data: dict, current_user):
-        """create a new customer"""
-        new_customer = self.customer_service.add_customer(customer_data, current_user)
-        return new_customer
+    def add(self, user, customer_data: dict):
+        check_permission(user, "add-customer")
+        # on affecte l'utilisateur créateur en tant que contact vente par défaut
+        customer_data.setdefault("contact_sales_id", user.id)
 
-    def update_customer(self, customer_id: int, update_data: dict, current_user):
-        """update customer's datas"""
-        updated_customer = self.customer_service.update_customer(customer_id, update_data, current_user)
-        return updated_customer
+        return super().create(customer_data, user)
 
-    def delete_customer(self, customer_id: int, current_user):
-        """(soft) delete a customer"""
-        self.customer_service.delete_customer(customer_id, current_user)
+    def update(self, customer_id, customer_data: dict, user):
+        check_permission(user, "update-customer")
+        # on récupère le client, pour vérifier le commercial responsable
+        customer = self.customer_service.get_by_id(customer_id)
+        # il faut que l'utilisateur courant soit le commercial responsable
+        if customer.contact_sales_id != user.id:
+            raise PermissionError("Only the responsible sales contact can update the customer")
+
+        # pour la mise à jour, on verifie si "contact_sales_id" est dans "customer_data"
+        contact_sales_id = customer_data.get("contact_sales_id")
+        if contact_sales_id:
+            # on vérifie que c'est bien un utilisateur avec le role "sales"
+            sales_contact = self.user_service.get_by_id(contact_sales_id)
+            if sales_contact.role != RoleType.sales:
+                full_name = f"{sales_contact.first_name} {sales_contact.last_name}"
+                raise InvalidUserRole(sales_contact.id, full_name)
+
+        return super().update(customer_id, customer_data, user)
+
+    def delete(self, user, customer_id):
+        check_permission(user, "delete-customer")
+        return super().delete(customer_id, user)
