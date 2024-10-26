@@ -12,8 +12,8 @@ ROLES_PERMISSIONS = {
     ],
     "manage": [
         "view-user", "add-user", "update-user", "delete-user",
-        "view-contract", "update-contract",
-        "view-event", "update-event", "delete-event",  # update event : peut tout modifier, meme l'user support
+        "view-contract", "add-contract", "update-contract",
+        "view-event", "update-event", "delete-event",
         "filter-event-without-support"
     ],
     "sales": [
