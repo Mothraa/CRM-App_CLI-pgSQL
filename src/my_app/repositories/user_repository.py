@@ -2,7 +2,6 @@
 # Il hérite de l'implémentation générique SQLAlchemyRepository
 from typing import Optional
 
-from sqlalchemy import exists
 from sqlalchemy.orm import Session
 
 from my_app.models import User
@@ -27,9 +26,3 @@ class UserRepository(SQLAlchemyRepository[User]):
         # scalar : pour retourner qu'un element dans sqlalchemy
         # add a filter to exclude soft deleted entities
         return self.db_session.query(User).filter(User.id == user_id, User.deleted_at.is_(None)).scalar()
-
-    def is_user_exist_by_email(self, email: str) -> bool:
-        """Checks if a user exists by email"""
-        # add a filter to exclude soft deleted entities
-        # scalar : pour retourner qu'un element dans sqlalchemy
-        return self.db_session.query(exists().where(User.email == email, User.deleted_at.is_(None))).scalar()
