@@ -16,6 +16,7 @@ class Base(DeclarativeBase):
     metadata = metadata_obj
 
 
+# evolution : déplacer les roles dans une table spécifique.
 class RoleType(str, Enum):
     admin = "admin"
     manage = "manage"
@@ -40,7 +41,6 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String, nullable=False)
     first_name: Mapped[str] = mapped_column(String, nullable=True)
     last_name: Mapped[str] = mapped_column(String, nullable=True)
-    # TODO : déplacer les roles dans une table spécifique.
     role: Mapped[RoleType] = mapped_column(SQLAEnum(RoleType), nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=False,
                                                  default=lambda: datetime.now(TIME_ZONE))
@@ -61,7 +61,6 @@ class Customer(Base):
     full_name: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str] = mapped_column(String, nullable=True)
     phone_number: Mapped[str] = mapped_column(String, nullable=True)
-    # TODO : eviter d'indiquer le schema (tout du moins en dur) pour la foreignkey
     contact_sales_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=False,
                                                  default=lambda: datetime.now(TIME_ZONE))
