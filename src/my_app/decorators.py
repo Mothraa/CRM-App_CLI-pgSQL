@@ -1,7 +1,9 @@
 from functools import wraps
 
-from sqlalchemy.exc import SQLAlchemyError
 import click
+from sqlalchemy.exc import SQLAlchemyError
+
+from my_app.exceptions import CustomPermissionError
 
 
 # base_repository
@@ -24,7 +26,7 @@ def exec_transaction(func):
     return wrapper
 
 
-# *_cli
+# cli
 def requires_auth(f):
     @click.pass_context
     @wraps(f)
@@ -34,4 +36,16 @@ def requires_auth(f):
             click.echo("Vous devez être connecté.")
             return
         return ctx.invoke(f, *args, **kwargs)
+    return decorated_function
+
+
+def handle_exceptions(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except CustomPermissionError as e:
+            click.echo(f"Erreur : {str(e)}")
+        except Exception as e:
+            click.echo(f"Une erreur inattendue s'est produite : {str(e)}")
     return decorated_function
