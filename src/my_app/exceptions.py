@@ -27,6 +27,22 @@ class LogoutError(Exception):
         super().__init__(self.message)
 
 
+class InvalidUserRole(ValueError):
+    """Raised when a user has invalid role for a given operation"""
+    def __init__(self, user_id: int, user_name: str, message=None):
+        if message is None:
+            message = f"L'utilisateur ID {user_id} ({user_name}) n'a pas le role requis"
+        self.message = message
+        super().__init__(self.message)
+
+
+class CustomPermissionError(PermissionError):
+    """Raised when the user don't have the permissions"""
+    def __init__(self, message: str = "Vous n'avez pas la permission"):
+        self.message = message
+        super().__init__(self.message)
+
+
 # token_service
 class TokenDeleteError(Exception):
     """Raised for errors when delete token file"""
@@ -48,3 +64,25 @@ class CustomerNotFoundError(Exception):
 
     def __str__(self):
         return f"CustomerNotFoundError: {self.message}"
+
+
+# contract_service
+class ContractNotFoundError(Exception):
+    """Exception raised when a contract is not found."""
+    def __init__(self, message: str = "Contract not found"):
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f"ContractNotFoundError: {self.message}"
+
+
+# event_service
+class EventNotFoundError(Exception):
+    """Exception raised when an event is not found."""
+    def __init__(self, message: str = "Event not found"):
+        self.message = message
+        super().__init__(self.message)
+
+    def __str__(self):
+        return f"EventNotFoundError: {self.message}"
