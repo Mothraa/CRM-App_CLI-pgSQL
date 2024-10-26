@@ -9,23 +9,28 @@ class UserController(BaseController):
         super().__init__(user_service)
 
     def list(self, user):
-        check_permission(user, 'view-user')
+        check_permission(user, "view-user")
         return super().list()
 
     def get(self, user, user_id: int):
         """Retrieve a specific user by ID"""
-        check_permission(user, 'view-user')
+        check_permission(user, "view-user")
         return super().get(user_id)
 
     def add(self, user, user_data: dict):
-        check_permission(user, 'add-user')
-        # TODO : hash pwd
+        check_permission(user, "add-user")
+        # on hash le password
+        if "password" in user_data:
+            user_data["password"] = self.user_service.hash_password(user_data["password"])
         return super().create(user_data, user)
 
     def update(self, user, user_id, user_data: dict):
-        check_permission(user, 'update-user')
+        check_permission(user, "update-user")
+        # on hash le password si présent dans les données a mettre à jour
+        if "password" in user_data:
+            user_data["password"] = self.user_service.hash_password(user_data["password"])
         return super().update(user_id, user_data, user)
 
     def delete(self, user, user_id):
-        check_permission(user, 'delete-user')
+        check_permission(user, "delete-user")
         return super().delete(user_id, user)
