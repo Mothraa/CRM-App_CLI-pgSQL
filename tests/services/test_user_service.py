@@ -1,9 +1,7 @@
 import pytest
 from unittest.mock import MagicMock
 
-from sqlalchemy.exc import IntegrityError
-
-from my_app.models import User, RoleType
+from my_app.models import RoleType
 from my_app.services.user_service import UserService
 
 
@@ -61,14 +59,11 @@ def test_add_user(mock_session, user_service, mock_user):
         "last_name": "LeVendeur",
         "role": RoleType.admin,
     }
-    # on simule un utilisateur connecté (current_user) avec les permissions qui vont bien
-    current_user = mock_user
-
     # on simule que le mail n'est pas déjà utilisé
     user_service.user_repository.get_by_email.return_value = None
 
     # ajout d'un utilisateur
-    new_user = user_service.add_user(user_data=user_data, current_user=current_user)
+    user_service.add(user_data=user_data)
 
     user_service.user_repository.add.assert_called_once()
 
@@ -80,7 +75,6 @@ def test_add_user(mock_session, user_service, mock_user):
     # assert new_user.role == user_data["role"]
     # # on verifie que le mdp a été stocké en hashé
     # assert new_user.password_hash != user_data["password"]
-
 
 
 @pytest.mark.unit
@@ -99,7 +93,7 @@ def test_create_user_duplicate_email(mock_session, user_service, mock_user):
 
     # on vérifie la levée d'exception lors de la création d'un utilisateur avec un email déjà pris
     with pytest.raises(ValueError, match="Email is already used"):
-        user_service.add_user(user_data=user_data, current_user=mock_user)
+        user_service.add(user_data=user_data)
 
 # @pytest.mark.unit
 # def test_create_test_accounts(user_service, mock_session, mocker):

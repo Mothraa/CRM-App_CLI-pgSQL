@@ -3,7 +3,7 @@ from my_app.models import User
 from my_app.repositories.user_repository import UserRepository
 
 
-def test_get_user_by_id_success(mock_session, mock_user):
+def test_get_by_id_user_success(mock_session, mock_user):
     """Test to retrieve a user by a correct ID"""
     repository = UserRepository(mock_session)
 
@@ -26,7 +26,7 @@ def test_get_user_by_id_success(mock_session, mock_user):
     mock_session.query.return_value.filter.return_value.first.assert_called_once()
 
 
-def test_get_user_by_id_not_found(mock_session):
+def test_get_by_id_user_not_found(mock_session):
     """Test to retrieve a user by a (false - not found) ID"""
     # mock_session.query(User).filter_by(id=666).first.return_value = None
     repository = UserRepository(mock_session)
@@ -51,7 +51,7 @@ def test_get_user_by_id_not_found(mock_session):
     mock_session.query.return_value.filter.return_value.first.assert_called_once()
 
 
-def test_get_user_by_email_success(mock_session, mock_user):
+def test_get_by_email_user_success(mock_session, mock_user):
     """Test to retrieve a user by a correct email"""
     fake_valid_email = "michel@test.com"
     repository = UserRepository(mock_session)
@@ -73,7 +73,7 @@ def test_get_user_by_email_success(mock_session, mock_user):
     mock_session.query.return_value.filter.return_value.first.assert_called_once()
 
 
-def test_get_user_by_email_not_found(mock_session):
+def test_get_by_email_user_not_found(mock_session):
     """Test to ensure None is returned when user is not found"""
     fake_invalid_email = "invalid_mail@test.com"
     repository = UserRepository(mock_session)
@@ -93,7 +93,6 @@ def test_get_user_by_email_not_found(mock_session):
 
     # On vérifie que first a été appelé après filter
     mock_session.query.return_value.filter.return_value.first.assert_called_once()
-
 
 
 # décorateur qui permet le test de plusieurs cas
