@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 from my_app.repositories.customer_repository import CustomerRepository
 from my_app.models import Customer
 from my_app.schemas.customer_schemas import CustomerAddSchema, CustomerUpdateSchema
-from my_app.permissions import has_permission  # , has_any_permission, has_all_permission
 from my_app.exceptions import CustomerNotFoundError
 
 
@@ -17,21 +16,19 @@ class CustomerService:
         self.session = session
         self.customer_repository = customer_repository
 
-    def get_customer_by_id(self, customer_id: int) -> Customer:
+    def get_by_id(self, customer_id: int) -> Customer:
         """Retrieve a customer by his ID"""
         customer = self.customer_repository.get_by_id(customer_id)
         if not customer:
             raise CustomerNotFoundError(f"No customer with ID: {customer_id}")
         return customer
 
-    def get_all_customers(self) -> list[Customer]:
-        """Retrieve all customers (can be paginated or filtered)"""
+    def get_all(self) -> list[Customer]:
+        """Retrieve all customers"""
         return self.customer_repository.get_all()
 
-    def add_customer(self, customer_data: dict, current_user) -> Customer:
+    def add(self, customer_data: dict) -> Customer:
         """Method to add a new customer"""
-        # on verifie la permission
-        has_permission(current_user, 'add-customer')  # leve une exception si NOK
         # on valide les données d'entrée avec pydantic
         customer_add = CustomerAddSchema(**customer_data)
         # on converti les données pydantic en dict
@@ -40,10 +37,8 @@ class CustomerService:
         new_customer = self.customer_repository.add(Customer(**customer_add_dict))
         return new_customer
 
-    def update_customer(self, customer_id: int, update_data: dict, current_user) -> Customer:
+    def update(self, customer_id: int, update_data: dict) -> Customer:
         """Method to update an existing customer."""
-        # on verifie la permission
-        has_permission(current_user, "update-customer")  # leve une exception si NOK
         # on valide les données d'entrée avec pydantic
         customer_update = CustomerUpdateSchema(**update_data)
 
@@ -52,18 +47,17 @@ class CustomerService:
         if not customer_to_update:
             raise CustomerNotFoundError(f"No customer with ID: {customer_id}")
 
-        # on applique la mise à jour des attributs
-        for key, value in customer_update.model_dump(exclude_unset=True).items():
+        data_to_update_dict = customer_update.model_dump(exclude_unset=True)
+        # # on applique la mise à jour des attributs
+        for key, value in data_to_update_dict.items():
+            print(f"DEBUG: Updating {key} with {value}")
             setattr(customer_to_update, key, value)
         # sauvegarde via le repository
-        updated_customer = self.customer_repository.update(customer_to_update)
+        updated_customer = self.customer_repository.update(customer_to_update, data_to_update_dict)
         return updated_customer
 
-    def delete_customer(self, customer_id: int, current_user):
+    def delete(self, customer_id: int):
         """Method to delete a customer (soft delete)."""
-        # on verifie la permission
-        has_permission(current_user, "delete-customer")  # leve une exception si NOK
-
         # on récupère le Customer à supprimer
         customer_to_delete = self.customer_repository.get_by_id(customer_id)
         if not customer_to_delete:
