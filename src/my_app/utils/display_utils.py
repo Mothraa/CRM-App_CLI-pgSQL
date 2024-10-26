@@ -10,12 +10,33 @@ NOT_AVAILABLE_CARACTER = "--"
 
 COLUMN_STYLES = {
     "id": "sky_blue1",
-    "name": "green",
+    "company name": "green",
+    "event_name": "orange3",
+    "first_name": "orange3",
+    "last_name": "orange3",
     "full_name": "orange3",
+    "role": "magenta3",
     "email": "deep_pink4",
     "phone_number": "yellow3",
     "sales_contact": "bold cyan",
-    "created_at": "grey74"
+    "created_at": "grey54",
+    "customer_name": "green",
+    "total_amount": "dark_orange",
+    "remaining_amount": "dark_orange",
+    "status": "magenta3",
+    "location": "green",
+    "start_date": "grey78",
+    "end_date": "grey78",
+    "contract": "plum1",
+    "support_contact": "bold cyan",
+    }
+
+CONTRACT_STATUS_ALIASES = {
+    "to_send": "À envoyer",
+    "pending": "En attente",
+    "canceled": "Annulé",
+    "signed": "Signé",
+    "finished": "Terminé"
 }
 
 
@@ -38,7 +59,7 @@ def display_authenticated_user(authenticated_user):
         panel = Panel(user_info, title="App User Infos", width=100, expand=False)
         console.print(panel, justify="left")
     else:
-        console.print(Panel("[red]No user authenticated[/red]", title="User Info", expand=False), justify="left")
+        console.print(Panel("[red]User not authenticated[/red]", title="User Info", expand=False), justify="left")
 
 
 def create_table(columns):
