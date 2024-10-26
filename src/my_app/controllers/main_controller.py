@@ -86,7 +86,7 @@ class MainController:
     def _fetch_user_from_token(self, decoded_token):
         """Fetch the User from his token"""
         user_id = decoded_token["user_id"]
-        user = self.user_service.get_user_by_id(user_id)
+        user = self.user_service.get_by_id(user_id)
         self.authenticated_user = user
         return user
 
