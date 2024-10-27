@@ -83,4 +83,6 @@ def init_contract_controller(session: Session):
 def init_event_controller(session: Session):
     """Create an instance of EventController"""
     event_service = get_event_service(session)
-    return EventController(event_service)
+    contract_service = get_contract_service(session)
+    user_service = get_user_service(session)
+    return EventController(event_service, contract_service, user_service)
