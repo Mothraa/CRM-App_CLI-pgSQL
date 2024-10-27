@@ -22,7 +22,7 @@ class UserController(BaseController):
         # on hash le password
         if "password" in user_data:
             user_data["password"] = self.user_service.hash_password(user_data["password"])
-        return super().create(user_data, user)
+        return super().add(user_data, user)
 
     def update(self, user, user_id, user_data: dict):
         check_permission(user, "update-user")
