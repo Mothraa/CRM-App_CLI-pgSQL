@@ -103,7 +103,7 @@ class Event(Base):
     attendees: Mapped[str] = mapped_column(String, nullable=True)
     comments: Mapped[str] = mapped_column(String, nullable=True)
     contract_id: Mapped[int] = mapped_column(ForeignKey("contract.id"), nullable=False)
-    contact_support_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=False)
+    contact_support_id: Mapped[int] = mapped_column(ForeignKey("user.id"), nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=False,
                                                  default=lambda: datetime.now(TIME_ZONE))
     updated_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), nullable=True)
