@@ -8,8 +8,12 @@ class ContractController(BaseController):
         """Inherits common methods from BaseController"""
         super().__init__(contract_service)
 
-    def list(self, user):
+    def list(self, user, unsigned=False, notpaid=False):
         check_permission(user, "view-contract")
+        if unsigned:
+            return self.service.get_unsigned_contracts()
+        if notpaid:
+            return self.service.get_notpaid_contracts()
         return super().list()
 
     def get(self, user, contract_id):
@@ -22,7 +26,10 @@ class ContractController(BaseController):
         # statut par défaut à "to_send" si pas spécifié
         if contract_data.get("status") is None:
             contract_data["status"] = ContractStatus.to_send.value
-        # contract_data.setdefault("status", ContractStatus.to_send.value)
+        # on met remaining_amount = total_amount lors de la création du contrat
+        # remaining_amount modifiable qu'en update
+        if "remaining_amount" not in contract_data:
+            contract_data["remaining_amount"] = contract_data["total_amount"]
         return super().add(contract_data)
 
     def update(self, user, contract_id, contract_data: dict):

@@ -65,14 +65,16 @@ def contract(ctx):
 
 @contract.command(help="List all contracts")
 @requires_auth
+@click.option('--unsigned', is_flag=True, help="List unsigned contracts")
+@click.option('--notpaid', is_flag=True, help="List contracts that are not totally paid")
 @click.pass_context
 @handle_exceptions
-def list(ctx):
+def list(ctx, unsigned, notpaid):
     """Display all contracts"""
     contract_controller = ctx.obj.get("contract_controller")
     # on récupère l"utilisateur authentifié
     current_user = ctx.obj["authenticated_user"]
-    contracts = contract_controller.list(current_user)
+    contracts = contract_controller.list(user=current_user, unsigned=unsigned, notpaid=notpaid)
     table = display_contract_table(contracts)
     console.print(table)
 
@@ -101,8 +103,6 @@ def get(ctx, contract_id):
 @click.argument("customer_id", metavar="<customer id>", type=int, required=True)
 @click.argument("sales_id", metavar="<sales contact id>", type=int, required=True)
 @click.option("--total_amount", metavar="<total contract amount>", type=float, help="Total amount of the contract")
-@click.option("--remaining_amount", metavar="<remaining amount to pay>", type=float,
-              help="Remaining amount of the contract")
 @click.option("--status", type=click.Choice([status.value for status in ContractStatus]),
               help="Contract status", required=False)
 @click.pass_context
@@ -115,7 +115,6 @@ def add(ctx, customer_id, sales_id, total_amount, remaining_amount, status):
         "customer_id": customer_id,
         "contact_sales_id": sales_id,
         "total_amount": total_amount,
-        "remaining_amount": remaining_amount,
         "status": status
     }
 

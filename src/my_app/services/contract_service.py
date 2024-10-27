@@ -27,6 +27,13 @@ class ContractService:
         """Retrieve all contracts"""
         return self.contract_repository.get_all()
 
+    def get_unsigned_contracts(self):
+        """Return contracts that ar not already signed (exclude cancelled and finished) => to_send and pending"""
+        return self.contract_repository.filter_by_status(["to_send", "pending"])
+
+    def get_notpaid_contracts(self):
+        return self.contract_repository.filter_by_notpaid_contracts()
+
     def add(self, contract_data: dict) -> Contract:
         """Method to add a new contract"""
         # on valide les données d'entrée avec pydantic
