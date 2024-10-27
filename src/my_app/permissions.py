@@ -14,19 +14,18 @@ ROLES_PERMISSIONS = {
         "view-user", "add-user", "update-user", "delete-user",
         "view-contract", "add-contract", "update-contract",
         "view-event", "update-event", "delete-event",
-        "filter-event-without-support"
     ],
     "sales": [
         "view-user",
         "view-customer", "add-customer", "update-customer",
-        "view-contract", "update-contract", "filter-contracts-assigned",
-        "view-event", "add-event",  # add event sans pouvoir assigner l'user support
+        "view-contract", "update-contract",
+        "view-event", "add-event",
     ],
     "support": [
         "view-user",
         "view-customer",
         "view-contract",
-        "view-event", "update-event", "filter-events-assigned"
+        "view-event", "update-event",
     ],
 }
 
@@ -76,13 +75,10 @@ def filter_commands_by_permissions(ctx):
 
     # Si aucun utilisateur n'est authentifié
     if not authenticated_user:
-        # Si on est dans le cas de `--help`, ne pas filtrer les commandes
+        # Si on est dans le cas de "--help", ne pas filtrer les commandes
         if ctx.invoked_subcommand == "help":
-            print("DEBUG: Aucune authentification pour --help, ne rien filtrer.")
             return  # Pas de filtrage des commandes
-
-        # Si on n'est pas dans le cas de `help`, masquer les groupes de commandes
-        print("DEBUG: Aucun utilisateur authentifié, masquage des commandes !!")
+        # Si on n'est pas dans le cas de "--help", masquer les groupes de commandes
         for group_name in COMMANDS_PERMISSIONS.keys():
             _hide_command_group(ctx, group_name)
         return
@@ -90,7 +86,6 @@ def filter_commands_by_permissions(ctx):
     # Si l'utilisateur est authentifié, on applique le filtrage des commandes
     role = authenticated_user.role
     permissions = ROLES_PERMISSIONS.get(role, [])
-    print(f"DEBUG: Permissions pour le rôle {role} : {permissions}")
 
     # Parcours des commandes et masquage de celles sans permission
     for cli_group_name, command_permissions in COMMANDS_PERMISSIONS.items():
@@ -105,7 +100,6 @@ def _hide_command_group(ctx, group_name):
     cli_group = ctx.command.get_command(ctx, group_name)
     if cli_group:
         cli_group.hidden = True
-        print(f"DEBUG Groupe '{group_name}' masqué.")
 
 
 def _hide_commands_without_permissions(cli_group, command_permissions, permissions, ctx):
@@ -114,6 +108,3 @@ def _hide_commands_without_permissions(cli_group, command_permissions, permissio
         command = cli_group.get_command(ctx, command_name)
         if command and required_permission not in permissions:
             command.hidden = True
-        #     print(f"DEBUG Commande '{command_name}' masqué, permission requise : '{required_permission}'")
-        # else:
-        #     print(f"DEBUG Commande '{command_name}' affiché, permission : '{required_permission}'")
