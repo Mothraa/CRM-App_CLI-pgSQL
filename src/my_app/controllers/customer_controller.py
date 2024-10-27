@@ -1,13 +1,11 @@
-from my_app.services.customer_service import CustomerService
 from my_app.controllers.base_controller import BaseController
-from my_app.services.user_service import UserService
 from my_app.exceptions import InvalidUserRole
 from my_app.permissions import check_permission
 from my_app.models import RoleType
 
 
 class CustomerController(BaseController):
-    def __init__(self, customer_service: CustomerService, user_service: UserService):
+    def __init__(self, customer_service, user_service):
         """Inherits common methods from BaseController"""
         super().__init__(customer_service)
         self.user_service = user_service

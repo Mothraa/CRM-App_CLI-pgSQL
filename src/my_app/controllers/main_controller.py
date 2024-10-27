@@ -1,12 +1,10 @@
 from my_app.models import User
-from my_app.services.user_service import UserService
 from my_app.exceptions import AuthenticationError, InvalidPasswordError
-from my_app.services.token_service import TokenManager
 
 
 class MainController:
 
-    def __init__(self, user_service: UserService, token_manager: TokenManager):
+    def __init__(self, user_service, token_manager):
         """
         param :
             user_service : injecté pour gérer l'identification

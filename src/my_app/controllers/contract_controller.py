@@ -1,11 +1,10 @@
-from my_app.services.contract_service import ContractService
 from my_app.controllers.base_controller import BaseController
 from my_app.permissions import check_permission
 from my_app.models import ContractStatus
 
 
 class ContractController(BaseController):
-    def __init__(self, contract_service: ContractService):
+    def __init__(self, contract_service):
         """Inherits common methods from BaseController"""
         super().__init__(contract_service)
 
