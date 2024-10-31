@@ -24,12 +24,12 @@ class CustomerController(BaseController):
         # on affecte l'utilisateur créateur en tant que contact vente par défaut
         customer_data.setdefault("contact_sales_id", user.id)
 
-        return super().add(customer_data, user)
+        return super().add(customer_data)
 
     def update(self, customer_id, customer_data: dict, user):
         check_permission(user, "update-customer")
         # on récupère le client, pour vérifier le commercial responsable
-        customer = self.customer_service.get_by_id(customer_id)
+        customer = self.service.get_by_id(customer_id)
         # il faut que l'utilisateur courant soit le commercial responsable
         if customer.contact_sales_id != user.id:
             raise PermissionError("Only the responsible sales contact can update the customer")
@@ -43,8 +43,8 @@ class CustomerController(BaseController):
                 full_name = f"{sales_contact.first_name} {sales_contact.last_name}"
                 raise InvalidUserRole(sales_contact.id, full_name)
 
-        return super().update(customer_id, customer_data, user)
+        return super().update(customer_id, customer_data)
 
     def delete(self, user, customer_id):
         check_permission(user, "delete-customer")
-        return super().delete(customer_id, user)
+        return super().delete(customer_id)
