@@ -53,22 +53,37 @@ def handle_exceptions(function):
     return decorated_function
 
 
+def serialize_args(arg):
+    """To manage unserializable data for sentry log"""
+    if isinstance(arg, (str, int, float, bool, type(None))):
+        return arg
+    elif hasattr(arg, "__dict__"):  # For objects with attributes
+        return {k: v for k, v in vars(arg).items() if isinstance(v, (str, int, float, bool, type(None)))}
+    else:
+        return str(arg)
+
+
 def log_user_actions(action):
     def decorator(function):
         @wraps(function)
         def wrapper(*args, **kwargs):
+            serialized_args = {f"arg_{i}": serialize_args(arg) for i, arg in enumerate(args)}
+            serialized_kwargs = {k: serialize_args(v) for k, v in kwargs.items()}
             result = function(*args, **kwargs)
+            serialized_result = serialize_args(result)
+
             # pas besoin de récupérer des infos utilisateurs, fait par sentry via set_user
             capture_message(
                 f"Action utilisateur : {action}",
                 level="info",
-                details={
-                    "Fonction": function.__name__,
-                    "Args": args,
-                    "Params": kwargs,
-                    "Result": result,
+                contexts={
+                    "Fonction": {"name": function.__name__},
+                    "Args": serialized_args,
+                    "Params": serialized_kwargs,
+                    "Result": serialized_result,
                 }
             )
+            flush()
             return result
         return wrapper
     return decorator
