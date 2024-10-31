@@ -53,7 +53,7 @@ class UserService:
             raise UserNotFoundError(f"Pas d'utilisateur avec l'email : {user_email}")
 
         if not self.verify_password(user.password_hash, password):
-            raise InvalidPasswordError("Password invalid")
+            raise InvalidPasswordError("Mot de passe invalide")
 
         return user
 
