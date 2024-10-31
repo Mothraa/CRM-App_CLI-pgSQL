@@ -1,5 +1,6 @@
 from my_app.models import User
-from my_app.exceptions import AuthenticationError, InvalidPasswordError
+from my_app.exceptions import InvalidPasswordError
+from sentry_sdk import set_user
 
 
 class MainController:
@@ -21,6 +22,9 @@ class MainController:
             user = self.user_service.authenticate_user(email, password)
             self.authenticated_user = user  # on stock l'utilisateur authentifié
 
+            # on ajoute l'utilisateur au contexte sentry
+            set_user({"id": user.id, "email": user.email})
+
             # on génère les JWT
             access_token = self.token_manager.generate_access_token(user.id)
             refresh_token = self.token_manager.generate_refresh_token(user.id)
@@ -30,10 +34,7 @@ class MainController:
         except InvalidPasswordError:
             # Retourner None pour indiquer un échec d'authentification
             return None
-        except AuthenticationError as e:
-            raise AuthenticationError(f"Échec de l'authentification : {e}")
-        except Exception as e:
-            raise Exception(f"Une erreur inattendue s'est produite : {e}")
+        # les autres exceptions sont capturées a un plus haut niveau
 
     def verify_and_refresh_token(self):
         """Verify the token and refresh if necessary"""
@@ -93,6 +94,7 @@ class MainController:
         # si nécessaire, réinit l'utilisateur authentifié
         if self.authenticated_user:
             self.authenticated_user = None
-
+        # on efface l'utilisateur du contexte sentry
+        set_user(None)
         # Supprime le fichier de tokens et retourne un bool
         return self.token_manager.delete_tokens()
