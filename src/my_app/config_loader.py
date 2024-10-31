@@ -20,6 +20,9 @@ DATABASE_APP_PASSWORD = os.getenv("DATABASE_APP_PASSWORD")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
+# chargement du DSN SENTRY
+SENTRY_DSN = os.getenv("SENTRY_DSN")
+
 # récupération des paramètres pour les tokens depuis le fichier config.yaml
 with open(config_path, "r") as config_file:
     config = yaml.safe_load(config_file)
