@@ -30,9 +30,9 @@ class CustomerController(BaseController):
         check_permission(user, "update-customer")
         # on récupère le client, pour vérifier le commercial responsable
         customer = self.service.get_by_id(customer_id)
-        # il faut que l'utilisateur courant soit le commercial responsable
-        if customer.contact_sales_id != user.id:
-            raise PermissionError("Only the responsible sales contact can update the customer")
+        # il faut que l'utilisateur courant soit le commercial responsable ou un admin
+        if user.role != RoleType.admin and customer.contact_sales_id != user.id:
+            raise PermissionError("Only the responsible sales contact or an admin can update the customer")
 
         # pour la mise à jour, on verifie si "contact_sales_id" est dans "customer_data"
         contact_sales_id = customer_data.get("contact_sales_id")

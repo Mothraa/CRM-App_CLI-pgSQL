@@ -8,7 +8,7 @@ ROLES_PERMISSIONS = {
         "view-user", "add-user", "update-user", "delete-user",
         "view-customer", "add-customer", "update-customer", "delete-customer",
         "view-contract", "add-contract", "update-contract",
-        "delete-contract", # non implémenté, tout contrat reste visible, utiliser le statut "annulé" si besoin
+        "delete-contract",  # non implémenté, tout contrat reste visible, utiliser le statut "annulé" si besoin
         "view-event", "add-event", "update-event", "delete-event",
     ],
     "manage": [
