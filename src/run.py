@@ -1,6 +1,5 @@
 import sentry_sdk
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
-from sentry_sdk.integrations.logging import LoggingIntegration
 
 from my_app.config_loader import SENTRY_DSN, DEBUG_MODE
 from my_app.cli.main_cli import cli
