@@ -1,9 +1,8 @@
 from functools import wraps
 
 import click
+from sentry_sdk import capture_exception, flush, capture_message
 from sqlalchemy.exc import SQLAlchemyError
-
-from my_app.exceptions import CustomPermissionError
 
 
 # base_repository
@@ -39,13 +38,37 @@ def requires_auth(f):
     return decorated_function
 
 
-def handle_exceptions(f):
-    @wraps(f)
+def handle_exceptions(function):
+    @wraps(function)
     def decorated_function(*args, **kwargs):
         try:
-            return f(*args, **kwargs)
-        except CustomPermissionError as e:
-            click.echo(f"Erreur : {str(e)}")
+            return function(*args, **kwargs)
         except Exception as e:
-            click.echo(f"Une erreur inattendue s'est produite : {str(e)}")
+            # on capture l'exception avec sentry
+            # TODO : a voir si on exclus de sentry les erreurs de permission (CustomPermissionError)
+            capture_exception(e)
+            # on force l'envoi immédiat à Sentry (lié a la fermeture rapide de l'app)
+            flush()
+            click.echo(f"Erreur : {str(e)}")
     return decorated_function
+
+
+def log_user_actions(action):
+    def decorator(function):
+        @wraps(function)
+        def wrapper(*args, **kwargs):
+            result = function(*args, **kwargs)
+            # pas besoin de récupérer des infos utilisateurs, fait par sentry via set_user
+            capture_message(
+                f"Action utilisateur : {action}",
+                level="info",
+                details={
+                    "Fonction": function.__name__,
+                    "Args": args,
+                    "Params": kwargs,
+                    "Result": result,
+                }
+            )
+            return result
+        return wrapper
+    return decorator
