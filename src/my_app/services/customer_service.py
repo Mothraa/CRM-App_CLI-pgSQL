@@ -52,7 +52,6 @@ class CustomerService:
         data_to_update_dict = customer_update.model_dump(exclude_unset=True)
         # # on applique la mise à jour des attributs
         for key, value in data_to_update_dict.items():
-            print(f"DEBUG: Updating {key} with {value}")
             setattr(customer_to_update, key, value)
         # sauvegarde via le repository
         updated_customer = self.customer_repository.update(customer_to_update, data_to_update_dict)
