@@ -36,6 +36,7 @@ def display_user_table(users):
 
 @click.group(help="User commands")
 @click.pass_context
+@handle_exceptions
 def user(ctx):
     """Group of commands to manage users"""
     session = ctx.obj['session']
