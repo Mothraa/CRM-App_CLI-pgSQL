@@ -1,12 +1,11 @@
-from sqlalchemy.orm import Session
-from my_app.repositories.event_repository import EventRepository
+from my_app.decorators import log_user_actions
 from my_app.models import Event
 from my_app.schemas.event_schemas import EventAddSchema, EventUpdateSchema
 from my_app.exceptions import EventNotFoundError
 
 
 class EventService:
-    def __init__(self, session: Session, event_repository: EventRepository):
+    def __init__(self, session, event_repository):
         """
         Services to create and manage event data.
         param :
@@ -16,14 +15,14 @@ class EventService:
         self.session = session
         self.event_repository = event_repository
 
-    def get_by_id(self, event_id: int) -> Event:
+    def get_by_id(self, event_id: int):
         """Retrieve an event by its ID"""
         event = self.event_repository.get_by_id(event_id)
         if not event:
             raise EventNotFoundError(f"No event with ID: {event_id}")
         return event
 
-    def get_all(self) -> list[Event]:
+    def get_all(self):
         """Retrieve all events"""
         return self.event_repository.get_all()
 
@@ -35,6 +34,7 @@ class EventService:
         """Return events assigned to a specific user (support)"""
         return self.event_repository.filter_by_contact_support_id(user_id)
 
+    @log_user_actions("Ajout d'un évènement")
     def add(self, event_data: dict) -> Event:
         """Method to add a new event"""
         # on valide les données d'entrée avec pydantic
@@ -42,10 +42,12 @@ class EventService:
         # on converti les données pydantic en dict
         event_add_dict = event_add.model_dump()
         # on créé le nouvel Event via le repository
+        # TODO : passer un dict pour éviter une dépendance au modèle
         new_event = self.event_repository.add(Event(**event_add_dict))
         return new_event
 
-    def update(self, event_id: int, update_data: dict) -> Event:
+    @log_user_actions("Mise à jour d'un évènement")
+    def update(self, event_id: int, update_data: dict):
         """Method to update an existing event."""
         # on valide les données d'entrée avec pydantic
         event_update = EventUpdateSchema(**update_data)
@@ -63,6 +65,7 @@ class EventService:
         updated_event = self.event_repository.update(event_to_update,  data_to_update_dict)
         return updated_event
 
+    @log_user_actions("Suppression d'un évènement")
     def delete(self, event_id: int):
         """Method to delete an event (soft delete)."""
         # on récupère l'Event à supprimer

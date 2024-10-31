@@ -1,15 +1,14 @@
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from sqlalchemy.orm import Session
 
-from my_app.repositories.user_repository import UserRepository
+from my_app.decorators import log_user_actions
 from my_app.models import User
 from my_app.schemas.user_schemas import UserAuthSchema, UserAddSchema, UserUpdateSchema
 from my_app.exceptions import UserNotFoundError, InvalidPasswordError
 
 
 class UserService:
-    def __init__(self, session: Session, user_repository: UserRepository):
+    def __init__(self, session, user_repository):
         """
         Services to create and manage users accounts
         param :
@@ -32,7 +31,7 @@ class UserService:
         except VerifyMismatchError:
             return False
 
-    def get_all(self) -> list[User]:
+    def get_all(self):
         """Retrieve all users"""
         return self.user_repository.get_all()
 
@@ -57,7 +56,8 @@ class UserService:
 
         return user
 
-    def add(self, user_data: dict) -> User:
+    @log_user_actions("Ajout d'un utilisateur")
+    def add(self, user_data: dict):
         """Method to add a new user. Hash the given password"""
         # On valide les données d'entrée avec Pydantic
         user_add = UserAddSchema(**user_data)
@@ -76,9 +76,11 @@ class UserService:
         del user_add_dict["password"]
 
         # création d'un utilisateur via le repository
+        # TODO : passer un dict pour éviter une dépendance au modèle
         new_user = self.user_repository.add(User(**user_add_dict))
         return new_user
 
+    @log_user_actions("Mise à jour d'un utilisateur")
     def update(self, user_id: int, update_data: dict) -> User:
         """Method to update an existing user"""
         # On valide les données d'entrée avec Pydantic
@@ -102,6 +104,7 @@ class UserService:
         updated_user = self.user_repository.update(user_to_update)
         return updated_user
 
+    @log_user_actions("Suppression d'un utilisateur")
     def delete(self, user_id: int):
         """Delete a User by his ID"""
         # On récupère l'utilisateur à supprimer

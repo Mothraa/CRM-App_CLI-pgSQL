@@ -1,12 +1,11 @@
-from sqlalchemy.orm import Session
-from my_app.repositories.customer_repository import CustomerRepository
+from my_app.decorators import log_user_actions
 from my_app.models import Customer
 from my_app.schemas.customer_schemas import CustomerAddSchema, CustomerUpdateSchema
 from my_app.exceptions import CustomerNotFoundError
 
 
 class CustomerService:
-    def __init__(self, session: Session, customer_repository: CustomerRepository):
+    def __init__(self, session, customer_repository):
         """
         Services to create and manage customer data.
         param :
@@ -16,28 +15,31 @@ class CustomerService:
         self.session = session
         self.customer_repository = customer_repository
 
-    def get_by_id(self, customer_id: int) -> Customer:
+    def get_by_id(self, customer_id: int):
         """Retrieve a customer by his ID"""
         customer = self.customer_repository.get_by_id(customer_id)
         if not customer:
             raise CustomerNotFoundError(f"No customer with ID: {customer_id}")
         return customer
 
-    def get_all(self) -> list[Customer]:
+    def get_all(self):
         """Retrieve all customers"""
         return self.customer_repository.get_all()
 
-    def add(self, customer_data: dict) -> Customer:
+    @log_user_actions("Ajout d'un client")
+    def add(self, customer_data: dict):
         """Method to add a new customer"""
         # on valide les données d'entrée avec pydantic
         customer_add = CustomerAddSchema(**customer_data)
         # on converti les données pydantic en dict
         customer_add_dict = customer_add.model_dump()
         # on créé le nouveau Customer via le repository
+        # TODO : passer un dict pour éviter une dépendance au modèle
         new_customer = self.customer_repository.add(Customer(**customer_add_dict))
         return new_customer
 
-    def update(self, customer_id: int, update_data: dict) -> Customer:
+    @log_user_actions("Modification d'un client")
+    def update(self, customer_id: int, update_data: dict):
         """Method to update an existing customer."""
         # on valide les données d'entrée avec pydantic
         customer_update = CustomerUpdateSchema(**update_data)
@@ -56,6 +58,7 @@ class CustomerService:
         updated_customer = self.customer_repository.update(customer_to_update, data_to_update_dict)
         return updated_customer
 
+    @log_user_actions("Suppression d'un client")
     def delete(self, customer_id: int):
         """Method to delete a customer (soft delete)."""
         # on récupère le Customer à supprimer
