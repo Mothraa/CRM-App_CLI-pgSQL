@@ -1,6 +1,6 @@
 from my_app.models import User
 from my_app.exceptions import InvalidPasswordError
-from sentry_sdk import capture_message, set_user
+from sentry_sdk import capture_message, flush, set_user
 
 
 class MainController:
@@ -26,6 +26,7 @@ class MainController:
             set_user({"id": user.id, "email": user.email})
             # journalisation de l'auth
             capture_message(f"Authentification OK pour ID : {user.id}, email : {user.email}", level="info")
+            flush()  # on envoi directement le message à sentry
             # on génère les JWT
             access_token = self.token_manager.generate_access_token(user.id)
             refresh_token = self.token_manager.generate_refresh_token(user.id)
@@ -34,6 +35,7 @@ class MainController:
             return user
         except InvalidPasswordError:
             capture_message(f"Erreur d'authentification : {email}", level="warning")
+            flush()  # on envoi directement le message à sentry
             # Retourner None pour indiquer un échec d'authentification
             return None
         # les autres exceptions sont capturées a un plus haut niveau
@@ -98,6 +100,7 @@ class MainController:
             # on journalise la déconnexion
             capture_message(f"Déconnexion de ID : {self.authenticated_user.id},\
                              email : {self.authenticated_user.email}", level="info")
+            flush()  # on envoi directement le message à sentry
             self.authenticated_user = None
         # on efface l'utilisateur du contexte sentry
         set_user(None)
