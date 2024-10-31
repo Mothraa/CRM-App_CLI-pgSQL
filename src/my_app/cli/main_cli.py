@@ -4,7 +4,7 @@ import click
 from rich.traceback import install
 
 from my_app.db_config import get_session
-from my_app.exceptions import AuthenticationError, LogoutError
+from my_app.exceptions import LogoutError
 from my_app.dependencies import init_main_controller
 from my_app.cli.customer_cli import customer
 from my_app.cli.contract_cli import contract
@@ -12,6 +12,8 @@ from my_app.cli.event_cli import event
 from my_app.cli.user_cli import user
 from my_app.permissions import filter_commands_by_permissions
 from my_app.utils.display_utils import display_authenticated_user
+from my_app.decorators import handle_exceptions
+
 
 install()  # activation des exceptions via rich
 
@@ -46,6 +48,7 @@ class HelpFilterGroup(click.Group):
 
 @click.group(cls=HelpFilterGroup, invoke_without_command=True)
 @click.pass_context
+@handle_exceptions
 def cli(ctx):
     """Click main command"""
     # charge le contrôleur et l'utilisateur
@@ -67,26 +70,25 @@ def cli(ctx):
 @cli.command(help="Authentificate the user")
 @click.argument('email', metavar='<user email>', required=True)
 @click.pass_context
+@handle_exceptions
 def login(ctx, email):
     """Command for authentificate the user"""
     # saisie du mdp masquée
     password = click.prompt("Mot de passe", hide_input=True)
     controller = ctx.obj['main_controller']
-    try:
-        user = controller.authenticate_user_controller(email, password)
-        if not user:
-            click.echo("Mot de passe incorrect.")
-            return
-        ctx.obj['authenticated_user'] = user  # pas utile actuellement car rechargé a chaque ctx
-        click.echo(f"Utilisateur {email} authentifié.")
-    # pour récupérer les AuthenticationError de authenticate_user_controller + indeterminées
-    except (AuthenticationError, Exception) as e:
-        raise AuthenticationError(f"Erreur d'authentification : {str(e)}")
+
+    user = controller.authenticate_user_controller(email, password)
+    if not user:
+        click.echo("Mot de passe incorrect.")
+        return
+    ctx.obj['authenticated_user'] = user  # pas utile actuellement car rechargé a chaque ctx
+    click.echo(f"Utilisateur {email} authentifié.")
 
 
 # Commande pour se déconnecter
 @cli.command(help="Logout the authentificated user")
 @click.pass_context
+@handle_exceptions
 def logout(ctx):
     """Déconnecte l'utilisateur"""
     # on récupère le controleur pour appeler la methode logout
