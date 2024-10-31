@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 # main
 from .services.token_service import TokenManager
-from .controllers.main_controller import MainController
+from .controllers.auth_controller import MainController
 # user
 from .repositories.user_repository import UserRepository
 from .services.user_service import UserService
