@@ -30,7 +30,7 @@ class EventController(BaseController):
         contract_id = event_data.get("contract_id")
         contract = self.contract_service.get_by_id(contract_id)
         if contract.status != "signed":
-            raise ValueError("Un évènement ne peut être ajouté qu'à un contrat au statut 'signed'.")
+            raise ValueError("Un évènement ne peut être ajouté qu'à un contrat au statut signé ('signed').")
         return super().add(event_data)
 
     def update(self, user, event_id, event_data: dict):
@@ -38,11 +38,12 @@ class EventController(BaseController):
         # on verifie si "contact_support_id" est présent dans "event_data"
         contact_support_id = event_data.get("contact_support_id")
         if contact_support_id:
-            # Récupérer l'utilisateur et vérifier son rôle
+            # on récupère l'utilisateur et verif son role
             support_contact = self.user_service.get_by_id(contact_support_id)
             if support_contact.role != RoleType.support:
                 full_name = f"{support_contact.first_name} {support_contact.last_name}"
                 raise InvalidUserRole(support_contact.id, full_name)
+
         return super().update(event_id, event_data)
 
     def delete(self, user, event_id):
