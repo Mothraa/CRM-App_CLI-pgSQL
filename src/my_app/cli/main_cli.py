@@ -61,8 +61,8 @@ def cli(ctx):
     # fonction d'affichage de l'utilisateur authentifié
     # Exclusion des cas de `--help` (racine) ou pour `login/logout`
     if (
-        ctx.invoked_subcommand not in ["login", "logout"]
-        and ctx.invoked_subcommand is not None
+        ctx.invoked_subcommand not in ["login", "logout"] and
+        ctx.invoked_subcommand is not None
     ):
         display_authenticated_user(ctx.obj['authenticated_user'])
 

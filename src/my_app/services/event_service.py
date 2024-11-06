@@ -62,7 +62,7 @@ class EventService:
         for key, value in data_to_update_dict.items():
             setattr(event_to_update, key, value)
         # sauvegarde via le repository
-        updated_event = self.event_repository.update(event_to_update,  data_to_update_dict)
+        updated_event = self.event_repository.update(event_to_update, data_to_update_dict)
         return updated_event
 
     @log_user_actions("Suppression d'un évènement")

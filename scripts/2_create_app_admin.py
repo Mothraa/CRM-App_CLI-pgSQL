@@ -151,27 +151,27 @@ class AppUserCreator:
                 # accede uniquement au schema, sur des opérations CRUD
                 session.execute(text(
                     f"GRANT USAGE ON SCHEMA {self.DATABASE_SCHEMA} TO {username};"
-                    ))
+                ))
                 # donne tous les privilèges sur toutes les tables du schema
                 session.execute(text(
                     f"GRANT SELECT, INSERT, UPDATE, DELETE"
                     f" ON ALL TABLES IN SCHEMA {self.DATABASE_SCHEMA} TO {username};"
-                    ))
+                ))
 
                 # donne tous les privilèges sur toutes les tables FUTURES du schema ("ALTER DEFAULT")
                 session.execute(text(
                     f"ALTER DEFAULT PRIVILEGES IN SCHEMA {self.DATABASE_SCHEMA}"
                     f" GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {username};"
-                    ))
+                ))
 
                 # on donne l'acces d'usage et de select sur toutes les sequences (mais sans pouvoir les modifier)
                 session.execute(text(
                     f"GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA {self.DATABASE_SCHEMA} TO {username};"
-                    ))
+                ))
                 session.execute(text(
                     f"ALTER DEFAULT PRIVILEGES IN SCHEMA {self.DATABASE_SCHEMA}"
                     f" GRANT USAGE, SELECT ON SEQUENCES TO {username};"
-                    ))
+                ))
 
                 # revoque les privileges sur les autres schemas (que public dans notre cas d'usage ici)
                 session.execute(text(f"REVOKE ALL ON SCHEMA public FROM {username};"))

@@ -29,7 +29,7 @@ COLUMN_STYLES = {
     "end_date": "grey78",
     "contract": "plum1",
     "support_contact": "bold cyan",
-    }
+}
 
 CONTRACT_STATUS_ALIASES = {
     "to_send": "À envoyer",

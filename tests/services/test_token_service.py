@@ -159,8 +159,8 @@ def test_refresh_access_token_valid(token_manager_fixture, monkeypatch, mock_use
     assert decoded_access_token["user_id"] == mock_user.id
     assert decoded_access_token["type"] == "access"
     assert decoded_access_token["iat"] == int(mock_time.timestamp())
-    assert decoded_access_token["exp"] == int((mock_time
-                                              + timedelta(minutes=token_manager_fixture.ACCESS_TOKEN_LIFETIME))
+    assert decoded_access_token["exp"] == int((mock_time +
+                                              timedelta(minutes=token_manager_fixture.ACCESS_TOKEN_LIFETIME))
                                               .timestamp())
 
 
