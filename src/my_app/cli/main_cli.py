@@ -20,8 +20,11 @@ install()  # activation des exceptions via rich
 
 def load_controller_and_user(ctx):
     """Initialise la session, le contrôleur principal et authentifie l'utilisateur"""
-    session = get_session()
-    ctx.ensure_object(dict)  # Assure que le contexte est un dictionnaire
+    # on init le context si il n'existe pas
+    if ctx.obj is None:
+        ctx.obj = {}
+    # si la session existe déjà dans le context on la récupère, sinon on la créé
+    session = ctx.obj.get("session") or get_session()
     ctx.obj["session"] = session
     ctx.obj["main_controller"] = init_main_controller(session)
 

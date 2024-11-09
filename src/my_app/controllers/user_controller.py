@@ -7,6 +7,7 @@ class UserController(BaseController):
     def __init__(self, user_service: UserService):
         """Inherits common methods from BaseController"""
         super().__init__(user_service)
+        self.user_service = self.service
 
     def list(self, user):
         check_permission(user, "view-user")
@@ -21,14 +22,14 @@ class UserController(BaseController):
         check_permission(user, "add-user")
         # on hash le password
         if "password" in user_data:
-            user_data["password"] = self.user_service.hash_password(user_data["password"])
+            user_data["password"] = self.service.hash_password(user_data["password"])
         return super().add(user_data)
 
     def update(self, user, user_id, user_data: dict):
         check_permission(user, "update-user")
         # on hash le password si présent dans les données a mettre à jour
         if "password" in user_data:
-            user_data["password"] = self.user_service.hash_password(user_data["password"])
+            user_data["password"] = self.service.hash_password(user_data["password"])
         return super().update(user_id, user_data)
 
     def delete(self, user, user_id):

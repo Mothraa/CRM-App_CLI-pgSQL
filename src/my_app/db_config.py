@@ -31,7 +31,6 @@ def get_engine(engine=None, database_name=DATABASE_NAME):
 
 def get_session():
     """Retourne une session SQLAlchemy basée sur l'engine"""
-    print("get_session() called with database:", DATABASE_NAME)  # Debug
     engine = get_engine()
     session_local = sessionmaker(bind=engine)
     return session_local()  # on retourne une instance de session

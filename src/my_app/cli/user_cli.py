@@ -80,14 +80,20 @@ def get(ctx, user_id):
 @requires_auth
 @click.argument('email', metavar='<user email>', required=True)
 @click.argument('password', metavar='<user password>', required=True)
+@click.argument('first_name', metavar='<first name>', required=True)
+@click.argument('last_name', metavar='<last name>', required=True)
 @click.argument('role', metavar='<user role>', type=click.Choice([r.value for r in RoleType]), required=True)
 @handle_exceptions
 @click.pass_context
-def add(ctx, email, password, role):
+def add(ctx, email, password, first_name, last_name, role):
     """Add a new user"""
     current_user = ctx.obj['authenticated_user']
     user_controller = ctx.obj['user_controller']
-    user_controller.add(current_user, {'email': email, 'password': password, 'role': role})
+    user_controller.add(current_user, {'email': email,
+                                       'password': password,
+                                       'first_name': first_name,
+                                       'last_name': last_name,
+                                       'role': role})
     console.print(f"User {email} added!")
 
 

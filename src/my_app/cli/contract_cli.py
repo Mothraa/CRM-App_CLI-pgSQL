@@ -107,7 +107,7 @@ def get(ctx, contract_id):
               help="Contract status", required=False)
 @click.pass_context
 @handle_exceptions
-def add(ctx, customer_id, sales_id, total_amount, remaining_amount, status):
+def add(ctx, customer_id, sales_id, total_amount, status):
     """Add a new contract"""
     current_user = ctx.obj["authenticated_user"]
     contract_controller = ctx.obj["contract_controller"]
@@ -154,7 +154,7 @@ def update(ctx, contract_id, customer_id, sales_id, total_amount, remaining_amou
         return
 
     contract_controller.update(current_user, contract_id, update_data)
-    console.print(f"Contract {contract_id} updated!")
+    console.print("Contract updated!")
 
 
 # pas de delete possible, tous les contrats restent visibles (statut annulé possible)
