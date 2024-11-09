@@ -16,7 +16,6 @@ class BaseController:
         """Retrieve an entity by ID"""
         return self.service.get_by_id(entity_id)
 
-    # TODO : remove current_user, les permissions sont vérifiées dans le controleur maintenant et plus dans le service
     def add(self, entity_data: dict):
         """Create a new entity"""
         return self.service.add(entity_data)
