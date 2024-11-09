@@ -90,7 +90,7 @@ Use the following sub-commands for specific actions with customers, contracts, e
     `Sub-command`: `user get <user_id>`
 
 -   **Add a new user**  
-    `Sub-command`: `user add <email> <password> <role>`
+    `Sub-command`: `user add <email> <password> <role> <first_name> <last_name>`
 
 -   **Update an existing user**  
     `Sub-command`: `user update <user_id> [--email <new email>] [--role <new role>]`
