@@ -1,5 +1,22 @@
 # Développez une architecture back-end sécurisée avec Python et SQL
 
+## Sommaire
+
+-   [Développez une architecture back-end sécurisée avec Python et SQL](#développez-une-architecture-back-end-sécurisée-avec-python-et-sql)
+    -   [Sommaire](#sommaire)
+    -   [À propos](#à-propos)
+    -   [Prérequis](#prérequis)
+    -   [Langages \& Librairies](#langages--librairies)
+    -   [Installation](#installation)
+    -   [Paramétrage de l'environnement](#paramétrage-de-lenvironnement)
+    -   [Création de la base de données](#création-de-la-base-de-données)
+    -   [Création de l'environnment de test (facultatif)](#création-de-lenvironnment-de-test-facultatif)
+    -   [Utilisation](#utilisation)
+    -   [MCD (Modèle Conceptuel des Données)](#mcd-modèle-conceptuel-des-données)
+    -   [workflow \& matrice de responsabilité](#workflow--matrice-de-responsabilité)
+    -   [Gestion des versions](#gestion-des-versions)
+    -   [Licence](#licence)
+
 ## À propos
 
 Formation OpenClassRooms - Architecture back-end - Projet 12
@@ -128,6 +145,10 @@ python src/run.py --help
 ```
 
 Un résumé des commandes est disponible : [Guide utilisateur](docs/user_guide.md)
+
+## MCD (Modèle Conceptuel des Données)
+
+[![MCD de l'application](docs/20241031_mcd_app_crm.png)](docs/20241031_mcd_app_crm.png)
 
 ## workflow & matrice de responsabilité
 
