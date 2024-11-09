@@ -2,7 +2,6 @@
 
 ## Sommaire
 
--   [Développez une architecture back-end sécurisée avec Python et SQL](#développez-une-architecture-back-end-sécurisée-avec-python-et-sql)
     -   [Sommaire](#sommaire)
     -   [À propos](#à-propos)
     -   [Prérequis](#prérequis)
@@ -13,7 +12,7 @@
     -   [Création de l'environnment de test (facultatif)](#création-de-lenvironnment-de-test-facultatif)
     -   [Utilisation](#utilisation)
     -   [MCD (Modèle Conceptuel des Données)](#mcd-modèle-conceptuel-des-données)
-    -   [workflow \& matrice de responsabilité](#workflow--matrice-de-responsabilité)
+    -   [Workflow \& matrice de responsabilité](#workflow--matrice-de-responsabilité)
     -   [Gestion des versions](#gestion-des-versions)
     -   [Licence](#licence)
 
@@ -150,7 +149,7 @@ Un résumé des commandes est disponible : [Guide utilisateur](docs/user_guide.m
 
 [![MCD de l'application](docs/20241031_mcd_app_crm.png)](docs/20241031_mcd_app_crm.png)
 
-## workflow & matrice de responsabilité
+## Workflow & matrice de responsabilité
 
 [![Workflow de création d'un évenement](docs/src/20241031_bpmn_customer-event_workflow.png)](docs/20241031_bpmn_customer-event_workflow.pdf)
 
