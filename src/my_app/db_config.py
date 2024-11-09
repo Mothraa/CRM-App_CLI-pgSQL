@@ -5,7 +5,7 @@ from .config_loader import (DATABASE_HOST, DATABASE_PORT, DATABASE_NAME, SSL_MOD
                             DATABASE_APP_USER, DATABASE_APP_PASSWORD, DEBUG_MODE)
 
 
-def get_engine(engine=None):
+def get_engine(engine=None, database_name=DATABASE_NAME):
     """create and return a SQLAlchemy engine
     param : engine values :  psycopg2 by default, can use pg8000"""
     if not engine or engine == "psycopg2":
@@ -22,7 +22,7 @@ def get_engine(engine=None):
         password=DATABASE_APP_PASSWORD,
         host=DATABASE_HOST,
         port=DATABASE_PORT,
-        database=DATABASE_NAME,
+        database=database_name,
         query=query_params,
     )
 
@@ -31,6 +31,7 @@ def get_engine(engine=None):
 
 def get_session():
     """Retourne une session SQLAlchemy basée sur l'engine"""
+    print("get_session() called with database:", DATABASE_NAME)  # Debug
     engine = get_engine()
     session_local = sessionmaker(bind=engine)
     return session_local()  # on retourne une instance de session
