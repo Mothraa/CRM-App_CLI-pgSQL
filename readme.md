@@ -2,21 +2,20 @@
 
 ## Sommaire
 
-    -   [Sommaire](#sommaire)
-    -   [À propos](#à-propos)
-    -   [Prérequis](#prérequis)
-    -   [Langages \& Librairies](#langages--librairies)
-    -   [Installation](#installation)
-    -   [Paramétrage de l'environnement](#paramétrage-de-lenvironnement)
-    -   [Création de la base de données](#création-de-la-base-de-données)
-    -   [Création de l'environnment de test (facultatif)](#création-de-lenvironnment-de-test-facultatif)
-    -   [Utilisation](#utilisation)
-    -   [MCD (Modèle Conceptuel des Données)](#mcd-modèle-conceptuel-des-données)
-    -   [Workflow \& matrice de responsabilité](#workflow--matrice-de-responsabilité)
-    -   [Gestion des versions](#gestion-des-versions)
-    -   [Licence](#licence)
+- [À propos](#a-propos)
+- [Prérequis](#prérequis)
+- [Langages & Librairies](#langages--librairies)
+- [Installation](#installation)
+- [Paramétrage de l'environnement](#paramétrage-de-lenvironnement)
+- [Création de la base de données](#création-de-la-base-de-données)
+- [Création de l'environnement de test (facultatif)](#création-de-lenvironnement-de-test-facultatif)
+- [Utilisation](#utilisation)
+- [MCD (Modèle Conceptuel des Données)](#mcd-modèle-conceptuel-des-données)
+- [Workflow & Matrice de responsabilité](#workflow--matrice-de-responsabilité)
+- [Gestion des versions](#gestion-des-versions)
+- [Licence](#licence)
 
-## À propos
+## A propos
 
 Formation OpenClassRooms - Architecture back-end - Projet 12
 
