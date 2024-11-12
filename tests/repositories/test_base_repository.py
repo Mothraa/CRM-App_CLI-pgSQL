@@ -7,6 +7,7 @@ from my_app.repositories.base_repository import SQLAlchemyRepository
 # inclus les tests sur des erreurs de transaction (via le décorateur exec_transaction)
 
 
+@pytest.mark.unit
 def test_add_transaction_success(mock_session, mock_user):
     """Test transaction success when add an entity"""
     repository = SQLAlchemyRepository(mock_session, mock_user.__class__)
@@ -17,6 +18,7 @@ def test_add_transaction_success(mock_session, mock_user):
     mock_session.commit.assert_called_once()
 
 
+@pytest.mark.unit
 def test_add_transaction_fail(mock_session, mock_user):
     """Test transaction rollback fail when add an entity"""
     repository = SQLAlchemyRepository(mock_session, mock_user.__class__)
@@ -34,6 +36,7 @@ def test_add_transaction_fail(mock_session, mock_user):
     mock_session.rollback.assert_called_once()
 
 
+@pytest.mark.unit
 def test_update_transaction_success(mock_session, mock_user):
     """Test transaction success when update an entity"""
     repository = SQLAlchemyRepository(mock_session, mock_user.__class__)
@@ -44,6 +47,7 @@ def test_update_transaction_success(mock_session, mock_user):
     mock_session.commit.assert_called_once()
 
 
+@pytest.mark.unit
 def test_update_transaction_fail(mock_session, mock_user):
     """Test transaction rollback fail when update an entity."""
     repository = SQLAlchemyRepository(mock_session, mock_user.__class__)
@@ -63,6 +67,7 @@ def test_update_transaction_fail(mock_session, mock_user):
     mock_session.rollback.assert_called_once()
 
 
+@pytest.mark.unit
 def test_soft_delete_transaction_success(mock_session, mock_user):
     """Test transaction success when delete an entity"""
     repository = SQLAlchemyRepository(mock_session, mock_user.__class__)
@@ -80,6 +85,7 @@ def test_soft_delete_transaction_success(mock_session, mock_user):
     assert result is None  # par convention, delete ne doit rien retourner
 
 
+@pytest.mark.unit
 def test_soft_delete_transaction_fail(mock_session, mock_user):
     """Test transaction rollback fail when delete an entity"""
     mock_session.delete.side_effect = SQLAlchemyError("Fake error !")

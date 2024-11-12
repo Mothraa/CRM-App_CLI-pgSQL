@@ -11,6 +11,7 @@ def main_controller(mock_session):
 
 
 # Test de l'authentification réussie
+@pytest.mark.unit
 def test_authenticate_user_controller_OK(main_controller, monkeypatch, mock_user):
     # Mock des méthodes du service utilisateur et du gestionnaire de tokens
     def mock_authenticate_user(email, password):
@@ -37,6 +38,7 @@ def test_authenticate_user_controller_OK(main_controller, monkeypatch, mock_user
     assert main_controller.authenticated_user == mock_user
 
 
+@pytest.mark.unit
 def test_authenticate_user_controller_fail(main_controller, monkeypatch):
     # on simule une auth qui lève une exception
     def mock_authenticate_user(email, password):
@@ -49,6 +51,7 @@ def test_authenticate_user_controller_fail(main_controller, monkeypatch):
         main_controller.authenticate_user_controller("test@example.com", "wrong_password")
 
 
+@pytest.mark.unit
 def test_verify_and_refresh_token(main_controller, monkeypatch, mock_user):
     def mock_load_tokens():
         return {
@@ -82,6 +85,7 @@ def test_verify_and_refresh_token(main_controller, monkeypatch, mock_user):
     assert result == mock_user
 
 
+@pytest.mark.unit
 def test_controller_logout(main_controller, mocker, monkeypatch, mock_authenticated_user):
     # Utiliser un mocker pour créer un mock de delete_tokens
     mock_delete_tokens = mocker.Mock()

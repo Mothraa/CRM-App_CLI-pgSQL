@@ -3,6 +3,7 @@ from my_app.models import User
 from my_app.repositories.user_repository import UserRepository
 
 
+@pytest.mark.unit
 def test_get_by_id_user_success(mock_session, mock_user):
     """Test to retrieve a user by a correct ID"""
     repository = UserRepository(mock_session)
@@ -26,6 +27,7 @@ def test_get_by_id_user_success(mock_session, mock_user):
     mock_session.query.return_value.filter.return_value.first.assert_called_once()
 
 
+@pytest.mark.unit
 def test_get_by_id_user_not_found(mock_session):
     """Test to retrieve a user by a (false - not found) ID"""
     # mock_session.query(User).filter_by(id=666).first.return_value = None
@@ -51,6 +53,7 @@ def test_get_by_id_user_not_found(mock_session):
     mock_session.query.return_value.filter.return_value.first.assert_called_once()
 
 
+@pytest.mark.unit
 def test_get_by_email_user_success(mock_session, mock_user):
     """Test to retrieve a user by a correct email"""
     fake_valid_email = "michel@test.com"
@@ -73,6 +76,7 @@ def test_get_by_email_user_success(mock_session, mock_user):
     mock_session.query.return_value.filter.return_value.first.assert_called_once()
 
 
+@pytest.mark.unit
 def test_get_by_email_user_not_found(mock_session):
     """Test to ensure None is returned when user is not found"""
     fake_invalid_email = "invalid_mail@test.com"
@@ -96,6 +100,7 @@ def test_get_by_email_user_not_found(mock_session):
 
 
 # décorateur qui permet le test de plusieurs cas
+@pytest.mark.unit
 @pytest.mark.parametrize("user_id, user_exists", [(8, True), (666, False),])
 def test_is_user_exist_by_id(mock_session, user_id, user_exists):
     """Test checking function "is_user_exist_by_id"""
