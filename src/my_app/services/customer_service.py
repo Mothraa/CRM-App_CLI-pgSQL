@@ -2,6 +2,7 @@ from my_app.decorators import log_user_actions
 from my_app.models import Customer
 from my_app.schemas.customer_schemas import CustomerAddSchema, CustomerUpdateSchema
 from my_app.exceptions import CustomerNotFoundError
+from my_app.utils.encryption_utils import encrypt, decrypt
 
 
 class CustomerService:
@@ -20,11 +21,31 @@ class CustomerService:
         customer = self.customer_repository.get_by_id(customer_id)
         if not customer:
             raise CustomerNotFoundError(f"No customer with ID: {customer_id}")
+
+        # dechiffrement des données
+        if customer.company_name:
+            customer.company_name = decrypt(customer.company_name)
+        if customer.full_name:
+            customer.full_name = decrypt(customer.full_name)
+        if customer.email:
+            customer.email = decrypt(customer.email)
+        if customer.phone_number:
+            customer.phone_number = decrypt(customer.phone_number)
         return customer
 
     def get_all(self):
         """Retrieve all customers"""
-        return self.customer_repository.get_all()
+        customers = self.customer_repository.get_all()
+        for customer in customers:
+            if customer.company_name:
+                customer.company_name = decrypt(customer.company_name)
+            if customer.full_name:
+                customer.full_name = decrypt(customer.full_name)
+            if customer.email:
+                customer.email = decrypt(customer.email)
+            if customer.phone_number:
+                customer.phone_number = decrypt(customer.phone_number)
+        return customers
 
     @log_user_actions("Ajout d'un client")
     def add(self, customer_data: dict):
@@ -33,6 +54,17 @@ class CustomerService:
         customer_add = CustomerAddSchema(**customer_data)
         # on converti les données pydantic en dict
         customer_add_dict = customer_add.model_dump()
+
+        # chiffrement des données
+        if 'company_name' in customer_add_dict:
+            customer_add_dict['company_name'] = encrypt(customer_add_dict['company_name'])
+        if 'full_name' in customer_add_dict:
+            customer_add_dict['full_name'] = encrypt(customer_add_dict['full_name'])
+        if 'email' in customer_add_dict:
+            customer_add_dict['email'] = encrypt(customer_add_dict['email'])
+        if 'phone_number' in customer_add_dict:
+            customer_add_dict['phone_number'] = encrypt(customer_add_dict['phone_number'])
+
         # on créé le nouveau Customer via le repository
         # TODO : passer un dict pour éviter une dépendance au modèle
         new_customer = self.customer_repository.add(Customer(**customer_add_dict))
@@ -50,6 +82,16 @@ class CustomerService:
             raise CustomerNotFoundError(f"No customer with ID: {customer_id}")
 
         data_to_update_dict = customer_update.model_dump(exclude_unset=True)
+        # chiffrement des données
+        if 'company_name' in data_to_update_dict:
+            data_to_update_dict['company_name'] = encrypt(data_to_update_dict['company_name'])
+        if 'full_name' in data_to_update_dict:
+            data_to_update_dict['full_name'] = encrypt(data_to_update_dict['full_name'])
+        if 'email' in data_to_update_dict:
+            data_to_update_dict['email'] = encrypt(data_to_update_dict['email'])
+        if 'phone_number' in data_to_update_dict:
+            data_to_update_dict['phone_number'] = encrypt(data_to_update_dict['phone_number'])
+
         # # on applique la mise à jour des attributs
         for key, value in data_to_update_dict.items():
             setattr(customer_to_update, key, value)
