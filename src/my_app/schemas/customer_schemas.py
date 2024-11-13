@@ -1,7 +1,7 @@
 from typing import Optional
 from typing_extensions import Annotated
 
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, Field, StringConstraints, EmailStr
 
 
 class BaseCustomerSchema(BaseModel):
@@ -25,6 +25,7 @@ class CustomerAddSchema(BaseCustomerSchema):
     contact_sales_id: int = Field(...,
                                   description="ID of the sales contact responsible for this customer"
                                   )  # ... => obligatoire (syntaxe pydantic)
+    email: EmailStr = Field(..., description="Customer email")
 
 
 class CustomerUpdateSchema(BaseCustomerSchema):
@@ -35,3 +36,4 @@ class CustomerUpdateSchema(BaseCustomerSchema):
                                      StringConstraints(min_length=10, max_length=15)]
                            ] = Field(None, description="Phone number")
     contact_sales_id: Optional[int] = Field(None, description="ID of the sales contact responsible of this customer")
+    email: EmailStr = Field(..., description="Customer email")
