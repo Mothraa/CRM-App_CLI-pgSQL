@@ -14,6 +14,7 @@ from my_app.repositories.contract_repository import ContractRepository
 from my_app.repositories.event_repository import EventRepository
 from my_app.db_config import get_session
 from my_app.models import RoleType, ContractStatus, Customer, Contract, Event
+from my_app.utils.encryption_utils import encrypt
 
 # nombre d'entités a générer par table
 NB_OF_ENTITIES = 10
@@ -59,10 +60,10 @@ def create_test_data(session, admin_user, faker):
             fake_email = f"{first_name}.{last_name}@fake.com"
 
             customer_data = {
-                "company_name": faker.company(),
-                "full_name": fake_full_name,
-                "email": fake_email,
-                "phone_number": faker.phone_number(),
+                "company_name": encrypt(faker.company()),
+                "full_name": encrypt(fake_full_name),
+                "email": encrypt(fake_email),
+                "phone_number": encrypt(faker.phone_number()),
                 "contact_sales_id": admin_user.id
             }
             customer = Customer(**customer_data)
